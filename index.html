@@ -1,20 +1,30 @@
 ```html
 <!DOCTYPE html>
 <html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Horse Racing 3D — V9</title>
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Horse Racing 3D — V9 FINAL</title>
 
 <style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
     width:100%;
     height:100%;
     overflow:hidden;
@@ -26,22 +36,33 @@ canvas{
     display:block;
 }
 
-/* =====================================================
+
+/* =========================================================
    LOADING
-===================================================== */
+========================================================= */
 
 #loading{
     position:fixed;
     inset:0;
     z-index:9999;
+
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
+
     color:white;
+
     background:
-        radial-gradient(circle at center,#294b34 0%,#071009 75%);
-    transition:.5s;
+        radial-gradient(
+            circle at center,
+            #294b34 0%,
+            #071009 75%
+        );
+
+    transition:
+        opacity .5s ease,
+        visibility .5s ease;
 }
 
 #loading.hide{
@@ -74,7 +95,7 @@ canvas{
     width:0%;
     height:100%;
     background:white;
-    transition:.2s;
+    transition:width .2s ease;
 }
 
 .loading-percent{
@@ -83,235 +104,271 @@ canvas{
     color:rgba(255,255,255,.5);
 }
 
-/* =====================================================
-   MENU
-===================================================== */
 
-#menu{
+/* =========================================================
+   SETUP MENU
+========================================================= */
+
+#setupPanel{
     position:fixed;
     inset:0;
-    z-index:900;
-    overflow-y:auto;
-    padding:30px 15px;
-    color:white;
+    z-index:9000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
     background:
-        radial-gradient(circle at top,#315f3b,#071009 70%);
+        radial-gradient(
+            circle at center,
+            rgba(42,78,52,.96),
+            rgba(4,10,6,.98)
+        );
+
+    overflow:auto;
+
+    transition:
+        opacity .5s ease,
+        visibility .5s ease;
 }
 
-.menu-container{
-    width:min(1050px,100%);
-    margin:auto;
+#setupPanel.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
 }
 
-.menu-title{
+.setup-box{
+    width:min(850px,94vw);
+    max-height:94vh;
+    overflow:auto;
+
+    padding:28px;
+
+    color:white;
+
+    border-radius:25px;
+
+    border:1px solid rgba(255,255,255,.15);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30,45,33,.96),
+            rgba(5,12,7,.98)
+        );
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.65);
+
+    backdrop-filter:blur(20px);
+}
+
+.setup-title{
     text-align:center;
-    font-size:clamp(30px,6vw,58px);
+    font-size:28px;
     font-weight:1000;
-    letter-spacing:5px;
+    letter-spacing:3px;
 }
 
-.menu-subtitle{
-    margin-top:8px;
+.setup-subtitle{
     text-align:center;
-    color:rgba(255,255,255,.6);
+    margin-top:7px;
+    color:rgba(255,255,255,.55);
+    font-size:12px;
 }
 
 .horse-grid{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:
+        repeat(4,1fr);
+
     gap:12px;
-    margin-top:30px;
+
+    margin-top:25px;
 }
 
 .horse-card{
-    padding:15px;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:18px;
-    background:rgba(0,0,0,.35);
-    backdrop-filter:blur(12px);
+    padding:14px;
+
+    border-radius:15px;
+
+    background:
+        rgba(255,255,255,.055);
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+    transition:.2s;
 }
 
-.horse-card.selected{
-    border-color:white;
-    box-shadow:0 0 0 2px rgba(255,255,255,.15);
-}
+.horse-card:hover{
+    background:
+        rgba(255,255,255,.1);
 
-.horse-preview{
-    height:110px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:65px;
+    transform:translateY(-2px);
 }
 
 .horse-number{
     font-size:10px;
     color:rgba(255,255,255,.45);
+    margin-bottom:8px;
 }
 
-.horse-card label{
-    display:block;
-    margin-top:8px;
-    font-size:10px;
-    color:rgba(255,255,255,.5);
-}
-
-.horse-card input,
-.horse-card select{
+.horse-preview{
     width:100%;
-    margin-top:5px;
-    padding:9px;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:8px;
+    height:8px;
+    border-radius:20px;
+    margin-bottom:10px;
+}
+
+.horse-input{
+    width:100%;
+
+    padding:9px 10px;
+
+    border:1px solid
+        rgba(255,255,255,.1);
+
     outline:none;
-    background:rgba(255,255,255,.08);
+
+    border-radius:9px;
+
+    background:
+        rgba(0,0,0,.25);
+
     color:white;
-}
 
-.horse-card option{
-    color:black;
-}
-
-.color-row{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-top:7px;
-}
-
-.color-row input[type=color]{
-    width:45px;
-    height:32px;
-    padding:2px;
-    margin:0;
-}
-
-.color-value{
-    font-size:10px;
-    color:rgba(255,255,255,.5);
-}
-
-.menu-settings{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:15px;
-    flex-wrap:wrap;
-    margin-top:25px;
-}
-
-.toggle-box{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:10px 14px;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:12px;
-    background:rgba(0,0,0,.3);
     font-size:12px;
 }
 
-#testModePanel{
-    display:none;
-    margin-top:15px;
-    padding:15px;
-    border:1px solid rgba(255,190,70,.25);
-    border-radius:15px;
-    background:rgba(70,40,0,.25);
+.horse-input:focus{
+    border-color:
+        rgba(255,255,255,.45);
 }
 
-#testModePanel.show{
-    display:block;
-}
-
-.test-title{
-    font-size:12px;
-    font-weight:900;
-    color:#ffd36a;
-}
-
-.test-info{
-    margin-top:5px;
-    font-size:10px;
-    color:rgba(255,255,255,.55);
-}
-
-#forcedWinner{
+.color-select{
     width:100%;
-    margin-top:10px;
-    padding:10px;
-    border:1px solid rgba(255,255,255,.12);
+    margin-top:7px;
+
+    padding:7px;
+
+    border:1px solid
+        rgba(255,255,255,.1);
+
     border-radius:8px;
+
+    background:#152218;
+
     color:white;
-    background:rgba(255,255,255,.08);
-}
 
-.menu-buttons{
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    margin-top:20px;
-}
-
-.menu-button{
-    padding:13px 25px;
-    border:0;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:900;
+    font-size:11px;
 }
 
 #startRaceButton{
+    width:100%;
+
+    margin-top:20px;
+
+    padding:14px;
+
+    border:0;
+
+    border-radius:13px;
+
     background:white;
+
     color:#101510;
+
+    font-size:14px;
+
+    font-weight:900;
+
+    cursor:pointer;
+
+    transition:.2s;
 }
 
-#resetSettings{
-    color:white;
-    background:rgba(255,255,255,.1);
+#startRaceButton:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 10px 30px
+        rgba(255,255,255,.15);
 }
 
-/* =====================================================
+
+/* =========================================================
    COUNTDOWN
-===================================================== */
+========================================================= */
 
 #countdown{
     position:fixed;
     inset:0;
+
     z-index:500;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     pointer-events:none;
+
     opacity:0;
+
     color:white;
-    font-size:clamp(90px,20vw,220px);
+
+    font-size:
+        clamp(90px,20vw,220px);
+
     font-weight:1000;
-    text-shadow:0 10px 50px rgba(0,0,0,.8);
+
+    text-shadow:
+        0 10px 50px rgba(0,0,0,.8);
+
+    transition:.15s;
 }
 
 #countdown.show{
     opacity:1;
 }
 
-/* =====================================================
-   HUD
-===================================================== */
+
+/* =========================================================
+   TOP HUD
+========================================================= */
 
 #topHud{
     position:fixed;
+
     top:18px;
     left:50%;
+
     transform:translateX(-50%);
+
     z-index:100;
+
     min-width:320px;
+
     padding:13px 22px;
+
     color:white;
     text-align:center;
+
     border-radius:16px;
-    border:1px solid rgba(255,255,255,.15);
-    background:rgba(0,0,0,.38);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    background:
+        rgba(0,0,0,.38);
+
     backdrop-filter:blur(15px);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.25);
 }
 
 .race-title{
@@ -326,50 +383,81 @@ canvas{
     color:rgba(255,255,255,.6);
 }
 
-/* =====================================================
-   LIVE POSITION
-===================================================== */
+
+/* =========================================================
+   LEADERBOARD
+========================================================= */
 
 #leaderboard{
     position:fixed;
+
     top:18px;
     right:18px;
+
     z-index:100;
-    width:230px;
+
+    width:225px;
+
     padding:14px;
+
     color:white;
+
     border-radius:16px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(0,0,0,.4);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+    background:
+        rgba(0,0,0,.42);
+
     backdrop-filter:blur(15px);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.25);
 }
 
 .lb-title{
     margin-bottom:10px;
+
     font-size:12px;
     font-weight:900;
+    letter-spacing:1px;
 }
 
 .lb-row{
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     padding:7px;
+
     margin-top:3px;
+
     border-radius:7px;
+
     font-size:11px;
-    color:rgba(255,255,255,.7);
+
+    color:
+        rgba(255,255,255,.7);
+
+    transition:.2s;
 }
 
 .lb-row.leading{
     color:white;
-    background:rgba(255,255,255,.13);
+
+    background:
+        rgba(255,255,255,.13);
 }
 
 .lb-left{
     display:flex;
     align-items:center;
     gap:7px;
+
+    min-width:0;
 }
 
 .lb-number{
@@ -380,52 +468,132 @@ canvas{
 
 .lb-player{
     font-weight:600;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    max-width:120px;
 }
 
 .lb-distance{
-    color:rgba(255,255,255,.5);
+    color:
+        rgba(255,255,255,.5);
+
+    white-space:nowrap;
 }
 
-/* =====================================================
+
+/* =========================================================
+   RACE EVENTS
+========================================================= */
+
+#eventText{
+    position:fixed;
+
+    left:50%;
+    top:24%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:200;
+
+    pointer-events:none;
+
+    color:white;
+
+    font-size:clamp(16px,3vw,28px);
+
+    font-weight:1000;
+
+    letter-spacing:2px;
+
+    text-shadow:
+        0 4px 20px rgba(0,0,0,.9);
+
+    opacity:0;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+#eventText.show{
+    opacity:1;
+
+    transform:
+        translate(-50%,-50%)
+        scale(1.05);
+}
+
+
+/* =========================================================
    START PANEL
-===================================================== */
+========================================================= */
 
 #startPanel{
     position:fixed;
+
     left:50%;
     bottom:25px;
+
     transform:translateX(-50%);
+
     z-index:100;
+
     padding:12px 20px;
+
     color:white;
+
     font-size:12px;
+
     border-radius:50px;
-    background:rgba(0,0,0,.42);
-    border:1px solid rgba(255,255,255,.12);
+
+    background:
+        rgba(0,0,0,.42);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
     backdrop-filter:blur(12px);
+
     transition:.4s;
 }
 
 #startPanel.hidden{
     opacity:0;
-    transform:translateX(-50%) translateY(20px);
+
+    transform:
+        translateX(-50%)
+        translateY(20px);
 }
 
-/* =====================================================
-   FINISH
-===================================================== */
+
+/* =========================================================
+   FINISH PANEL
+========================================================= */
 
 #finishPanel{
     position:fixed;
+
     inset:0;
+
     z-index:800;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     opacity:0;
     visibility:hidden;
-    background:rgba(0,0,0,.55);
+
+    background:
+        rgba(0,0,0,.58);
+
     backdrop-filter:blur(8px);
+
     transition:.5s;
 }
 
@@ -436,20 +604,32 @@ canvas{
 
 .finish-box{
     width:min(450px,90vw);
+
     max-height:90vh;
+
     overflow:auto;
+
     padding:30px;
+
     color:white;
     text-align:center;
+
     border-radius:25px;
-    border:1px solid rgba(255,255,255,.15);
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
     background:
         linear-gradient(
             145deg,
             rgba(30,45,33,.97),
             rgba(5,12,7,.97)
         );
-    box-shadow:0 30px 100px rgba(0,0,0,.6);
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.6);
 }
 
 .finish-trophy{
@@ -458,14 +638,19 @@ canvas{
 
 .finish-title{
     margin-top:8px;
+
     font-size:28px;
+
     font-weight:1000;
 }
 
 .finish-subtitle{
     margin-top:6px;
+
     font-size:12px;
-    color:rgba(255,255,255,.5);
+
+    color:
+        rgba(255,255,255,.5);
 }
 
 .final-list{
@@ -475,78 +660,144 @@ canvas{
 
 .final-row{
     display:flex;
+
     justify-content:space-between;
-    padding:9px 12px;
+    align-items:center;
+
+    padding:10px 12px;
+
     margin-top:5px;
+
     border-radius:9px;
-    background:rgba(255,255,255,.06);
+
+    background:
+        rgba(255,255,255,.06);
+
     font-size:13px;
 }
 
 .final-row.first{
-    background:rgba(255,255,255,.15);
+    background:
+        rgba(255,255,255,.15);
+
+    font-weight:900;
+}
+
+.final-speed{
+    color:
+        rgba(255,255,255,.45);
+
+    font-size:10px;
 }
 
 #againButton{
     width:100%;
+
     margin-top:22px;
+
     padding:13px;
+
     border:0;
+
     border-radius:12px;
+
     background:white;
+
     color:#101510;
+
     font-weight:900;
+
     cursor:pointer;
+
+    transition:.2s;
 }
 
-/* =====================================================
-   EFFECT
-===================================================== */
+#againButton:hover{
+    transform:translateY(-2px);
+}
+
+
+/* =========================================================
+   CINEMATIC
+========================================================= */
 
 #cinematicVignette{
     position:fixed;
     inset:0;
+
     z-index:20;
+
     pointer-events:none;
+
     background:
         radial-gradient(
             ellipse at center,
             transparent 45%,
             rgba(0,0,0,.24) 100%
         );
-    box-shadow:inset 0 0 90px rgba(0,0,0,.22);
+
+    box-shadow:
+        inset 0 0 90px
+        rgba(0,0,0,.22);
 }
 
 #raceFlash{
     position:fixed;
+
     inset:0;
+
     z-index:25;
+
     pointer-events:none;
+
     opacity:0;
-    background:rgba(255,255,255,.28);
+
+    background:
+        rgba(255,255,255,.28);
+
+    transition:
+        opacity .12s ease;
 }
 
 #raceVignette{
     position:fixed;
+
     inset:0;
+
     z-index:50;
+
     pointer-events:none;
-    box-shadow:inset 0 0 140px rgba(0,0,0,.35);
+
+    box-shadow:
+        inset 0 0 140px
+        rgba(0,0,0,.35);
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
 
-@media(max-width:800px){
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:700px){
+
+    .setup-box{
+        padding:18px;
+    }
 
     .horse-grid{
-        grid-template-columns:repeat(2,1fr);
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .setup-title{
+        font-size:21px;
     }
 
     #topHud{
         top:10px;
+
         min-width:220px;
+
         padding:9px 14px;
     }
 
@@ -557,7 +808,9 @@ canvas{
     #leaderboard{
         top:70px;
         right:10px;
+
         width:175px;
+
         padding:10px;
     }
 
@@ -565,130 +818,126 @@ canvas{
         font-size:9px;
     }
 
+    .lb-player{
+        max-width:90px;
+    }
+
     #startPanel{
         bottom:12px;
         font-size:10px;
     }
+
 }
 
-@media(max-width:450px){
-
-    .horse-grid{
-        grid-template-columns:1fr;
-    }
-
-    .horse-preview{
-        height:80px;
-    }
-}
 </style>
 
+
+<!-- =======================================================
+     IMPORT MAP
+======================================================= -->
+
 <script type="importmap">
+
 {
     "imports":{
-        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        "three":
+        "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+
+        "three/addons/":
+        "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     }
 }
+
 </script>
+
 </head>
 
+
 <body>
+
 
 <div id="cinematicVignette"></div>
 <div id="raceFlash"></div>
 <div id="raceVignette"></div>
 
-<!-- =====================================================
+
+<!-- =======================================================
      LOADING
-===================================================== -->
+======================================================= -->
 
 <div id="loading">
-    <div class="loading-title">HORSE RACING</div>
-    <div class="loading-subtitle">Preparing race...</div>
+
+    <div class="loading-title">
+        HORSE RACING
+    </div>
+
+    <div class="loading-subtitle">
+        Preparing horses...
+    </div>
 
     <div class="loading-bar">
+
         <div id="loading-progress"></div>
+
     </div>
 
-    <div class="loading-percent">0%</div>
+    <div class="loading-percent">
+        0%
+    </div>
+
 </div>
 
-<!-- =====================================================
-     MENU
-===================================================== -->
 
-<div id="menu">
+<!-- =======================================================
+     SETUP
+======================================================= -->
 
-    <div class="menu-container">
+<div id="setupPanel">
 
-        <div class="menu-title">
-            🏇 HORSE RACING
+    <div class="setup-box">
+
+        <div class="setup-title">
+            🐎 HORSE RACING
         </div>
 
-        <div class="menu-subtitle">
-            Pilih kuda dan atur nama sebelum race
+        <div class="setup-subtitle">
+            Pilih warna dan beri nama setiap kuda
         </div>
 
-        <div class="horse-grid" id="horseGrid"></div>
-
-        <div class="menu-settings">
-
-            <label class="toggle-box">
-                <input type="checkbox" id="testMode">
-                TEST MODE
-            </label>
-
+        <div class="horse-grid"
+             id="horseGrid">
         </div>
 
-        <div id="testModePanel">
-
-            <div class="test-title">
-                🧪 TEST MODE
-            </div>
-
-            <div class="test-info">
-                Mode ini hanya untuk testing.
-                Pilih pemenang race saat ini.
-            </div>
-
-            <select id="forcedWinner">
-                <option value="-1">
-                    Random Winner
-                </option>
-            </select>
-
-        </div>
-
-        <div class="menu-buttons">
-
-            <button
-                class="menu-button"
-                id="resetSettings">
-                ↺ RESET
-            </button>
-
-            <button
-                class="menu-button"
-                id="startRaceButton">
-                🏁 START RACE
-            </button>
-
-        </div>
+        <button id="startRaceButton">
+            🏁 START RACE
+        </button>
 
     </div>
 
 </div>
 
-<!-- =====================================================
+
+<!-- =======================================================
      COUNTDOWN
-===================================================== -->
+======================================================= -->
 
-<div id="countdown">3</div>
+<div id="countdown">
+    3
+</div>
 
-<!-- =====================================================
-     HUD
-===================================================== -->
+
+<!-- =======================================================
+     EVENT
+======================================================= -->
+
+<div id="eventText">
+    OVERTAKE!
+</div>
+
+
+<!-- =======================================================
+     TOP HUD
+======================================================= -->
 
 <div id="topHud">
 
@@ -698,15 +947,17 @@ canvas{
 
     <div
         class="race-status"
-        id="raceStatus">
+        id="raceStatus"
+    >
         Preparing race...
     </div>
 
 </div>
 
-<!-- =====================================================
+
+<!-- =======================================================
      LEADERBOARD
-===================================================== -->
+======================================================= -->
 
 <div id="leaderboard">
 
@@ -718,17 +969,19 @@ canvas{
 
 </div>
 
-<!-- =====================================================
+
+<!-- =======================================================
      START PANEL
-===================================================== -->
+======================================================= -->
 
 <div id="startPanel">
     8 HORSES • AUTOMATIC RACE
 </div>
 
-<!-- =====================================================
-     FINISH
-===================================================== -->
+
+<!-- =======================================================
+     FINISH PANEL
+======================================================= -->
 
 <div id="finishPanel">
 
@@ -748,8 +1001,8 @@ canvas{
 
         <div
             class="final-list"
-            id="finalList">
-        </div>
+            id="finalList"
+        ></div>
 
         <button id="againButton">
             🔄 RACE AGAIN
@@ -759,26 +1012,30 @@ canvas{
 
 </div>
 
-<!-- =====================================================
+
+<!-- =======================================================
      THREE.JS
-===================================================== -->
+======================================================= -->
 
 <script type="module">
 
-import * as THREE from "three";
+import * as THREE
+from "three";
 
 import {
     GLTFLoader
-} from "three/addons/loaders/GLTFLoader.js";
+}
+from "three/addons/loaders/GLTFLoader.js";
 
 import {
     clone as cloneSkeleton
-} from "three/addons/utils/SkeletonUtils.js";
+}
+from "three/addons/utils/SkeletonUtils.js";
 
 
-/* =====================================================
+/* =========================================================
    CONFIG
-===================================================== */
+========================================================= */
 
 const HORSE_FILE =
     "./quaternius_cc0-white-horse-1081(1).glb";
@@ -791,100 +1048,98 @@ const START_Z = 20;
 
 const FINISH_Z = -280;
 
-const RACE_DISTANCE =
-    START_Z - FINISH_Z;
 
-
-/* =====================================================
+/* =========================================================
    HORSE COLORS
-===================================================== */
+========================================================= */
 
-const defaultColors = [
-    "#8B4513",
-    "#111111",
-    "#FFFFFF",
-    "#654321",
-    "#A0522D",
-    "#3B2415",
-    "#C8A27A",
-    "#4B3621"
+const HORSE_COLORS = [
+
+    {
+        name:"Chestnut",
+        color:0x7b3f22
+    },
+
+    {
+        name:"Black",
+        color:0x171717
+    },
+
+    {
+        name:"Dark Brown",
+        color:0x3b2115
+    },
+
+    {
+        name:"White",
+        color:0xe8e8e8
+    },
+
+    {
+        name:"Golden",
+        color:0xb67b27
+    },
+
+    {
+        name:"Grey",
+        color:0x777777
+    },
+
+    {
+        name:"Red Brown",
+        color:0x8f4528
+    },
+
+    {
+        name:"Dark Grey",
+        color:0x363636
+    }
+
 ];
 
 
-/* =====================================================
-   HORSE NAMES
-===================================================== */
+/* =========================================================
+   DEFAULT HORSE NAMES
+========================================================= */
 
 const defaultNames = [
+
     "Thunder",
-    "Blaze",
+    "Black Storm",
+    "Lightning",
+    "Red Fury",
+    "Golden Flash",
     "Shadow",
-    "Storm",
-    "Rocket",
-    "Comet",
-    "Hunter",
-    "Flash"
+    "Blaze",
+    "Wild Runner"
+
 ];
 
 
-/* =====================================================
-   HORSE DATA
-===================================================== */
-
-let horseSettings =
-    JSON.parse(
-        localStorage.getItem(
-            "horseSettingsV9"
-        ) || "null"
-    );
-
-if(!horseSettings){
-
-    horseSettings =
-        defaultNames.map(
-            (name,index)=>({
-
-                name:name,
-
-                color:
-                    defaultColors[index]
-
-            })
-        );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    GLOBAL
-===================================================== */
+========================================================= */
 
 let scene;
+
 let camera;
+
 let renderer;
+
 let clock;
 
 let horses = [];
 
 let raceStarted = false;
+
 let raceFinished = false;
+
 let countdownRunning = false;
 
 let finishOrder = [];
 
-let forcedWinner = -1;
-
-let testMode = false;
-
-let raceNumber =
-    Number(
-        localStorage.getItem(
-            "horseRaceNumber"
-        ) || 1
-    );
-
-
 let dustMesh;
+
 let dustParticles = [];
 
 let cameraTarget =
@@ -893,10 +1148,12 @@ let cameraTarget =
 let cameraLook =
     new THREE.Vector3();
 
+let cameraShake = 0;
 
-/* =====================================================
+
+/* =========================================================
    DOM
-===================================================== */
+========================================================= */
 
 const loading =
     document.getElementById("loading");
@@ -905,379 +1162,204 @@ const progress =
     document.getElementById("loading-progress");
 
 const loadingPercent =
-    document.querySelector(
-        ".loading-percent"
-    );
+    document.querySelector(".loading-percent");
 
-const menu =
-    document.getElementById("menu");
+const setupPanel =
+    document.getElementById("setupPanel");
 
 const horseGrid =
     document.getElementById("horseGrid");
 
-const testModeInput =
-    document.getElementById("testMode");
-
-const testModePanel =
-    document.getElementById(
-        "testModePanel"
-    );
-
-const forcedWinnerSelect =
-    document.getElementById(
-        "forcedWinner"
-    );
-
 const startRaceButton =
-    document.getElementById(
-        "startRaceButton"
-    );
-
-const resetSettings =
-    document.getElementById(
-        "resetSettings"
-    );
+    document.getElementById("startRaceButton");
 
 const countdown =
-    document.getElementById(
-        "countdown"
-    );
+    document.getElementById("countdown");
 
 const raceStatus =
-    document.getElementById(
-        "raceStatus"
-    );
+    document.getElementById("raceStatus");
 
 const leaderRows =
-    document.getElementById(
-        "leaderRows"
-    );
+    document.getElementById("leaderRows");
 
 const startPanel =
-    document.getElementById(
-        "startPanel"
-    );
+    document.getElementById("startPanel");
 
 const finishPanel =
-    document.getElementById(
-        "finishPanel"
-    );
+    document.getElementById("finishPanel");
 
 const finalList =
-    document.getElementById(
-        "finalList"
-    );
+    document.getElementById("finalList");
 
 const againButton =
-    document.getElementById(
-        "againButton"
-    );
+    document.getElementById("againButton");
 
 const raceFlash =
-    document.getElementById(
-        "raceFlash"
-    );
+    document.getElementById("raceFlash");
+
+const eventText =
+    document.getElementById("eventText");
 
 
-/* =====================================================
-   MENU
-===================================================== */
+/* =========================================================
+   SETUP MENU
+========================================================= */
 
-function buildMenu(){
+function createSetupMenu(){
 
     horseGrid.innerHTML = "";
 
-    forcedWinnerSelect.innerHTML =
-        `<option value="-1">
-            Random Winner
-        </option>`;
-
     for(
-        let i=0;
-        i<HORSE_COUNT;
+        let i = 0;
+        i < HORSE_COUNT;
         i++
     ){
 
-        const data =
-            horseSettings[i];
-
         const card =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
         card.className =
             "horse-card";
 
+        const color =
+            HORSE_COLORS[i];
+
         card.innerHTML = `
 
-            <div class="horse-preview">
-                🐎
-            </div>
-
             <div class="horse-number">
-                HORSE ${i+1}
+                HORSE ${i + 1}
             </div>
 
-            <label>
-                NAMA KUDA
-            </label>
+            <div
+                class="horse-preview"
+                id="preview-${i}"
+                style="
+                    background:#${color.color
+                        .toString(16)
+                        .padStart(6,"0")}
+                "
+            ></div>
 
             <input
-                type="text"
+                class="horse-input"
+                id="horse-name-${i}"
+                value="${defaultNames[i]}"
                 maxlength="18"
-                value="${escapeHtml(data.name)}"
-                data-name="${i}"
+                placeholder="Nama kuda"
             >
 
-            <label>
-                WARNA KUDA
-            </label>
+            <select
+                class="color-select"
+                id="horse-color-${i}"
+            >
 
-            <div class="color-row">
+                ${HORSE_COLORS.map(
+                    (c,index) => `
+                        <option
+                            value="${index}"
+                            ${index === i ? "selected" : ""}
+                        >
+                            ${c.name}
+                        </option>
+                    `
+                ).join("")}
 
-                <input
-                    type="color"
-                    value="${data.color}"
-                    data-color="${i}"
-                >
-
-                <span class="color-value">
-                    ${data.color}
-                </span>
-
-            </div>
+            </select>
 
         `;
 
         horseGrid.appendChild(card);
 
-
-        const option =
-            document.createElement(
-                "option"
+        const colorSelect =
+            card.querySelector(
+                ".color-select"
             );
 
-        option.value = i;
+        colorSelect.addEventListener(
+            "change",
+            function(){
 
-        option.textContent =
-            `${i+1}. ${data.name}`;
+                const selected =
+                    HORSE_COLORS[
+                        Number(this.value)
+                    ];
 
-        forcedWinnerSelect.appendChild(
-            option
+                const hex =
+                    selected.color
+                        .toString(16)
+                        .padStart(6,"0");
+
+                card.querySelector(
+                    ".horse-preview"
+                ).style.background =
+                    "#" + hex;
+
+            }
         );
 
     }
 
-
-    document
-        .querySelectorAll(
-            "[data-name]"
-        )
-        .forEach(input=>{
-
-            input.addEventListener(
-                "input",
-                function(){
-
-                    const index =
-                        Number(
-                            this.dataset.name
-                        );
-
-                    horseSettings[index].name =
-                        this.value ||
-                        `Horse ${index+1}`;
-
-                    saveSettings();
-
-                    updateForcedWinnerOptions();
-
-                }
-            );
-
-        });
-
-
-    document
-        .querySelectorAll(
-            "[data-color]"
-        )
-        .forEach(input=>{
-
-            input.addEventListener(
-                "input",
-                function(){
-
-                    const index =
-                        Number(
-                            this.dataset.color
-                        );
-
-                    horseSettings[index].color =
-                        this.value;
-
-                    this.nextElementSibling
-                        .textContent =
-                        this.value;
-
-                    saveSettings();
-
-                }
-            );
-
-        });
-
 }
 
 
-function updateForcedWinnerOptions(){
+/* =========================================================
+   READ PLAYER SETTINGS
+========================================================= */
 
-    const old =
-        forcedWinnerSelect.value;
+function getHorseSettings(){
 
-    forcedWinnerSelect.innerHTML =
-        `<option value="-1">
-            Random Winner
-        </option>`;
+    const settings = [];
 
-    horseSettings.forEach(
-        (horse,index)=>{
+    for(
+        let i = 0;
+        i < HORSE_COUNT;
+        i++
+    ){
 
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value = index;
-
-            option.textContent =
-                `${index+1}. ${horse.name}`;
-
-            forcedWinnerSelect.appendChild(
-                option
+        const nameInput =
+            document.getElementById(
+                `horse-name-${i}`
             );
 
+        const colorSelect =
+            document.getElementById(
+                `horse-color-${i}`
+            );
+
+        let name =
+            nameInput.value.trim();
+
+        if(!name){
+            name =
+                `Horse ${i + 1}`;
         }
-    );
 
-    forcedWinnerSelect.value =
-        old;
+        const colorIndex =
+            Number(colorSelect.value);
+
+        settings.push({
+
+            name:name,
+
+            colorIndex:colorIndex,
+
+            color:
+                HORSE_COLORS[
+                    colorIndex
+                ].color
+
+        });
+
+    }
+
+    return settings;
 
 }
 
 
-/* =====================================================
-   ESCAPE HTML
-===================================================== */
-
-function escapeHtml(text){
-
-    return String(text)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-
-}
-
-
-/* =====================================================
-   SAVE SETTINGS
-===================================================== */
-
-function saveSettings(){
-
-    localStorage.setItem(
-        "horseSettingsV9",
-        JSON.stringify(
-            horseSettings
-        )
-    );
-
-}
-
-
-/* =====================================================
-   RESET SETTINGS
-===================================================== */
-
-resetSettings.addEventListener(
-    "click",
-    function(){
-
-        horseSettings =
-            defaultNames.map(
-                (name,index)=>({
-
-                    name:name,
-
-                    color:
-                        defaultColors[index]
-
-                })
-            );
-
-        saveSettings();
-
-        buildMenu();
-
-    }
-);
-
-
-/* =====================================================
-   TEST MODE
-===================================================== */
-
-testModeInput.addEventListener(
-    "change",
-    function(){
-
-        testMode =
-            this.checked;
-
-        testModePanel
-            .classList.toggle(
-                "show",
-                testMode
-            );
-
-    }
-);
-
-
-/* =====================================================
-   START BUTTON
-===================================================== */
-
-startRaceButton.addEventListener(
-    "click",
-    function(){
-
-        saveSettings();
-
-        testMode =
-            testModeInput.checked;
-
-        forcedWinner =
-            Number(
-                forcedWinnerSelect.value
-            );
-
-        menu.style.display =
-            "none";
-
-        startNewRace();
-
-    }
-);
-
-
-/* =====================================================
+/* =========================================================
    INIT
-===================================================== */
+========================================================= */
 
 function init(){
 
@@ -1293,22 +1375,31 @@ function init(){
         );
 
 
+    /* CAMERA */
+
     camera =
         new THREE.PerspectiveCamera(
+
             55,
+
             window.innerWidth /
             window.innerHeight,
+
             .1,
+
             1000
+
         );
 
 
     camera.position.set(
-        0,
-        10,
-        30
+        32,
+        19,
+        18
     );
 
+
+    /* RENDERER */
 
     renderer =
         new THREE.WebGLRenderer({
@@ -1322,16 +1413,23 @@ function init(){
 
 
     renderer.setPixelRatio(
+
         Math.min(
             window.devicePixelRatio,
             2
         )
+
     );
 
+
     renderer.setSize(
+
         window.innerWidth,
+
         window.innerHeight
+
     );
+
 
     renderer.shadowMap.enabled =
         true;
@@ -1348,6 +1446,7 @@ function init(){
     renderer.toneMappingExposure =
         1.1;
 
+
     document.body.appendChild(
         renderer.domElement
     );
@@ -1359,6 +1458,8 @@ function init(){
 
     createDustSystem();
 
+    createSetupMenu();
+
     loadHorse();
 
 
@@ -1368,21 +1469,15 @@ function init(){
     );
 
 
+    startRaceButton.addEventListener(
+        "click",
+        startConfiguredRace
+    );
+
+
     againButton.addEventListener(
         "click",
-        function(){
-
-            finishPanel
-                .classList.remove(
-                    "show"
-                );
-
-            menu.style.display =
-                "block";
-
-            buildMenu();
-
-        }
+        restartRace
     );
 
 
@@ -1391,17 +1486,21 @@ function init(){
 }
 
 
-/* =====================================================
-   LIGHT
-===================================================== */
+/* =========================================================
+   LIGHTS
+========================================================= */
 
 function createLights(){
 
     const hemi =
         new THREE.HemisphereLight(
+
             0xffffff,
+
             0x36553a,
+
             2.5
+
         );
 
     scene.add(hemi);
@@ -1409,9 +1508,13 @@ function createLights(){
 
     const sun =
         new THREE.DirectionalLight(
+
             0xffffff,
+
             3.5
+
         );
+
 
     sun.position.set(
         -40,
@@ -1419,14 +1522,16 @@ function createLights(){
         30
     );
 
-    sun.castShadow =
-        true;
+
+    sun.castShadow = true;
+
 
     sun.shadow.mapSize.width =
         2048;
 
     sun.shadow.mapSize.height =
         2048;
+
 
     sun.shadow.camera.left =
         -100;
@@ -1440,14 +1545,15 @@ function createLights(){
     sun.shadow.camera.bottom =
         -100;
 
+
     scene.add(sun);
 
 }
 
 
-/* =====================================================
+/* =========================================================
    WORLD
-===================================================== */
+========================================================= */
 
 function createWorld(){
 
@@ -1460,11 +1566,15 @@ function createWorld(){
             ),
 
             new THREE.MeshStandardMaterial({
+
                 color:0x4c9f50,
+
                 roughness:1
+
             })
 
         );
+
 
     grass.rotation.x =
         -Math.PI / 2;
@@ -1484,11 +1594,15 @@ function createWorld(){
             ),
 
             new THREE.MeshStandardMaterial({
+
                 color:0x956c51,
+
                 roughness:.95
+
             })
 
         );
+
 
     track.rotation.x =
         -Math.PI / 2;
@@ -1503,8 +1617,8 @@ function createWorld(){
 
 
     for(
-        let i=-4;
-        i<=4;
+        let i = -4;
+        i <= 4;
         i++
     ){
 
@@ -1528,14 +1642,21 @@ function createWorld(){
 
             );
 
+
         line.rotation.x =
             -Math.PI / 2;
 
+
         line.position.set(
+
             i * LANE_SPACING,
+
             .045,
+
             0
+
         );
+
 
         scene.add(line);
 
@@ -1543,28 +1664,32 @@ function createWorld(){
 
 
     createFence(-14);
+
     createFence(14);
 
     createStartLine();
+
     createFinishLine();
+
     createFinishArch();
 
     createTrees();
+
     createMountains();
 
 }
 
 
-/* =====================================================
+/* =========================================================
    FENCE
-===================================================== */
+========================================================= */
 
 function createFence(x){
 
     for(
-        let z=-320;
-        z<=50;
-        z+=5
+        let z = -320;
+        z <= 50;
+        z += 5
     ){
 
         const post =
@@ -1582,14 +1707,14 @@ function createFence(x){
 
             );
 
+
         post.position.set(
             x,
             .68,
             z
         );
 
-        post.castShadow =
-            true;
+        post.castShadow = true;
 
         scene.add(post);
 
@@ -1609,10 +1734,11 @@ function createFence(x){
 
             );
 
+
         rail.position.set(
             x,
             .95,
-            z+2.5
+            z + 2.5
         );
 
         scene.add(rail);
@@ -1622,9 +1748,9 @@ function createFence(x){
 }
 
 
-/* =====================================================
-   START / FINISH
-===================================================== */
+/* =========================================================
+   START LINE
+========================================================= */
 
 function createStartLine(){
 
@@ -1643,6 +1769,7 @@ function createStartLine(){
 
         );
 
+
     line.position.set(
         0,
         .06,
@@ -1653,6 +1780,10 @@ function createStartLine(){
 
 }
 
+
+/* =========================================================
+   FINISH LINE
+========================================================= */
 
 function createFinishLine(){
 
@@ -1671,6 +1802,7 @@ function createFinishLine(){
 
         );
 
+
     line.position.set(
         0,
         .07,
@@ -1682,6 +1814,10 @@ function createFinishLine(){
 }
 
 
+/* =========================================================
+   FINISH ARCH
+========================================================= */
+
 function createFinishArch(){
 
     const material =
@@ -1692,13 +1828,17 @@ function createFinishArch(){
 
     const left =
         new THREE.Mesh(
+
             new THREE.BoxGeometry(
                 .4,
                 7,
                 .4
             ),
+
             material
+
         );
+
 
     left.position.set(
         -10,
@@ -1731,6 +1871,7 @@ function createFinishArch(){
 
         );
 
+
     top.position.set(
         0,
         7,
@@ -1742,42 +1883,51 @@ function createFinishArch(){
 }
 
 
-/* =====================================================
+/* =========================================================
    TREES
-===================================================== */
+========================================================= */
 
 function createTrees(){
 
     for(
-        let i=0;
-        i<80;
+        let i = 0;
+        i < 80;
         i++
     ){
 
         const side =
-            Math.random()<.5
+            Math.random() < .5
             ? -1
             : 1;
+
 
         const x =
             side *
             (
                 18 +
-                Math.random()*25
+                Math.random() * 25
             );
+
 
         const z =
             -320 +
-            Math.random()*380;
+            Math.random() * 380;
 
-        createTree(x,z);
+
+        createTree(
+            x,
+            z
+        );
 
     }
 
 }
 
 
-function createTree(x,z){
+function createTree(
+    x,
+    z
+){
 
     const trunk =
         new THREE.Mesh(
@@ -1795,14 +1945,14 @@ function createTree(x,z){
 
         );
 
+
     trunk.position.set(
         x,
         1.4,
         z
     );
 
-    trunk.castShadow =
-        true;
+    trunk.castShadow = true;
 
     scene.add(trunk);
 
@@ -1822,29 +1972,29 @@ function createTree(x,z){
 
         );
 
+
     crown.position.set(
         x,
         3.4,
         z
     );
 
-    crown.castShadow =
-        true;
+    crown.castShadow = true;
 
     scene.add(crown);
 
 }
 
 
-/* =====================================================
+/* =========================================================
    MOUNTAINS
-===================================================== */
+========================================================= */
 
 function createMountains(){
 
     for(
-        let i=0;
-        i<14;
+        let i = 0;
+        i < 14;
         i++
     ){
 
@@ -1852,26 +2002,42 @@ function createMountains(){
             new THREE.Mesh(
 
                 new THREE.ConeGeometry(
-                    10+Math.random()*10,
-                    18+Math.random()*12,
+                    10 +
+                    Math.random() * 10,
+
+                    18 +
+                    Math.random() * 12,
+
                     4
+
                 ),
 
                 new THREE.MeshStandardMaterial({
+
                     color:0x668568,
+
                     roughness:1
+
                 })
 
             );
 
+
         mountain.position.set(
-            -120+i*18,
+
+            -120 +
+            i * 18,
+
             8,
+
             -280
+
         );
+
 
         mountain.rotation.y =
             Math.random();
+
 
         scene.add(mountain);
 
@@ -1880,9 +2046,9 @@ function createMountains(){
 }
 
 
-/* =====================================================
-   DUST
-===================================================== */
+/* =========================================================
+   DUST SYSTEM
+========================================================= */
 
 function createDustSystem(){
 
@@ -1892,6 +2058,7 @@ function createDustSystem(){
             6,
             6
         );
+
 
     const material =
         new THREE.MeshBasicMaterial({
@@ -1911,13 +2078,14 @@ function createDustSystem(){
         new THREE.InstancedMesh(
             geometry,
             material,
-            160
+            180
         );
 
 
     dustMesh.instanceMatrix.setUsage(
         THREE.DynamicDrawUsage
     );
+
 
     scene.add(dustMesh);
 
@@ -1927,8 +2095,8 @@ function createDustSystem(){
 
 
     for(
-        let i=0;
-        i<160;
+        let i = 0;
+        i < 180;
         i++
     ){
 
@@ -1945,6 +2113,7 @@ function createDustSystem(){
             vz:0,
 
             life:0,
+
             maxLife:1,
 
             scale:1
@@ -1969,102 +2138,106 @@ function createDustSystem(){
 
     }
 
+
+    dustMesh.instanceMatrix.needsUpdate =
+        true;
+
 }
 
-
-/* =====================================================
-   SPAWN DUST
-===================================================== */
 
 function spawnDust(horse){
 
     const p =
         dustParticles.find(
-            x=>!x.active
+            x => !x.active
         );
 
-    if(!p)return;
 
-    p.active=true;
+    if(!p) return;
+
+
+    p.active = true;
 
     p.x =
         horse.model.position.x +
-        (Math.random()-.5)*.55;
+        (Math.random() - .5) * .55;
 
     p.y =
-        .08+
-        Math.random()*.2;
+        .08 +
+        Math.random() * .2;
 
     p.z =
-        horse.model.position.z+
-        1+
-        Math.random()*.7;
+        horse.model.position.z +
+        1 +
+        Math.random() * .7;
 
     p.vx =
-        (Math.random()-.5)*.9;
+        (Math.random() - .5) * .9;
 
     p.vy =
-        .25+
-        Math.random()*.55;
+        .25 +
+        Math.random() * .55;
 
     p.vz =
-        .8+
-        Math.random()*1.5;
+        .8 +
+        Math.random() * 1.5;
 
-    p.life=0;
+    p.life = 0;
 
     p.maxLife =
-        .45+
-        Math.random()*.55;
+        .45 +
+        Math.random() * .55;
 
     p.scale =
-        .55+
-        Math.random()*.8;
+        .55 +
+        Math.random() * .8;
 
 }
 
 
-/* =====================================================
-   UPDATE DUST
-===================================================== */
-
 function updateDust(delta){
 
-    if(!dustMesh)return;
+    if(!dustMesh) return;
+
 
     const dummy =
         new THREE.Object3D();
 
+
     for(
-        let i=0;
-        i<dustParticles.length;
+        let i = 0;
+        i < dustParticles.length;
         i++
     ){
 
         const p =
             dustParticles[i];
 
+
         if(p.active){
 
             p.life += delta;
 
             p.x +=
-                p.vx*delta;
+                p.vx * delta;
 
             p.y +=
-                p.vy*delta;
+                p.vy * delta;
 
             p.z +=
-                p.vz*delta;
+                p.vz * delta;
 
             p.vy -=
-                1.15*delta;
+                1.15 * delta;
+
 
             if(
-                p.life>=p.maxLife
+                p.life >=
+                p.maxLife
             ){
 
-                p.active=false;
+                p.active =
+                    false;
 
             }
 
@@ -2077,17 +2250,22 @@ function updateDust(delta){
                 p.life /
                 p.maxLife;
 
+
             dummy.position.set(
                 p.x,
                 p.y,
                 p.z
             );
 
+
             dummy.scale.setScalar(
+
                 Math.max(
                     .001,
-                    p.scale*(1-t)
+                    p.scale *
+                    (1 - t)
                 )
+
             );
 
         }
@@ -2113,14 +2291,16 @@ function updateDust(delta){
 
     }
 
-    dustMesh.instanceMatrix.needsUpdate=true;
+
+    dustMesh.instanceMatrix.needsUpdate =
+        true;
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD HORSE
-===================================================== */
+========================================================= */
 
 function loadHorse(){
 
@@ -2141,59 +2321,76 @@ function loadHorse(){
                 "100%";
 
 
-            createHorses(gltf);
+            createHorses(
+                gltf
+            );
 
 
             setTimeout(
+
                 function(){
 
                     loading.classList.add(
                         "hide"
                     );
 
-                    menu.style.display =
-                        "block";
+                    setupPanel.classList.remove(
+                        "hidden"
+                    );
+
+                    raceStatus.textContent =
+                        "Pilih kuda kamu";
 
                 },
+
                 500
+
             );
 
         },
-
 
         function(xhr){
 
             if(xhr.total){
 
                 const percent =
-                    xhr.loaded /
-                    xhr.total *
-                    100;
+                    (
+                        xhr.loaded /
+                        xhr.total
+                    ) * 100;
+
 
                 progress.style.width =
-                    percent+"%";
+                    percent + "%";
+
 
                 loadingPercent.textContent =
-                    Math.round(percent)+"%";
+                    Math.round(percent)
+                    + "%";
 
             }
 
         },
 
-
         function(error){
 
-            console.error(error);
+            console.error(
+                "GLB LOAD ERROR",
+                error
+            );
+
 
             document.querySelector(
                 ".loading-title"
             ).textContent =
                 "GLB ERROR";
 
+
             document.querySelector(
                 ".loading-subtitle"
             ).textContent =
                 "File GLB tidak dapat dimuat";
+
 
             loadingPercent.textContent =
                 "ERROR";
@@ -2205,27 +2402,47 @@ function loadHorse(){
 }
 
 
-/* =====================================================
+/* =========================================================
    CREATE HORSES
-===================================================== */
+========================================================= */
 
 function createHorses(gltf){
 
-    horses=[];
+    horses = [];
 
 
     let gallop =
         gltf.animations.find(
+
             animation =>
                 animation.name
                     .toLowerCase()
-                    .includes("gallop")
+                    .trim() ===
+                "gallop"
+
         );
 
 
+    if(!gallop){
+
+        gallop =
+            gltf.animations.find(
+
+                animation =>
+                    animation.name
+                        .toLowerCase()
+                        .includes(
+                            "gallop"
+                        )
+
+            );
+
+    }
+
+
     for(
-        let i=0;
-        i<HORSE_COUNT;
+        let i = 0;
+        i < HORSE_COUNT;
         i++
     ){
 
@@ -2233,6 +2450,7 @@ function createHorses(gltf){
             cloneSkeleton(
                 gltf.scene
             );
+
 
         scene.add(horse);
 
@@ -2243,51 +2461,70 @@ function createHorses(gltf){
             1
         );
 
-        horse.updateMatrixWorld(true);
+
+        horse.updateMatrixWorld(
+            true
+        );
 
 
         let box =
             new THREE.Box3();
 
-        box.setFromObject(horse);
+
+        box.setFromObject(
+            horse
+        );
 
 
         const size =
             new THREE.Vector3();
 
-        box.getSize(size);
+
+        box.getSize(
+            size
+        );
 
 
         const TARGET_HEIGHT =
             3.55;
 
 
-        if(size.y>.001){
+        if(
+            size.y > .001
+        ){
 
             const scale =
                 TARGET_HEIGHT /
                 size.y;
 
-            horse.scale.setScalar(
+
+            horse.scale.set(
+                scale,
+                scale,
                 scale
             );
 
         }
 
 
-        horse.updateMatrixWorld(true);
+        horse.updateMatrixWorld(
+            true
+        );
 
 
         box =
             new THREE.Box3();
 
-        box.setFromObject(horse);
+
+        box.setFromObject(
+            horse
+        );
 
 
         const x =
             (
-                i-3.5
-            )*
+                i - 3.5
+            ) *
             LANE_SPACING;
 
 
@@ -2307,37 +2544,26 @@ function createHorses(gltf){
 
 
         horse.traverse(
-            object=>{
 
-                if(object.isMesh){
+            object => {
 
-                    object.castShadow=true;
+                if(
+                    object.isMesh
+                ){
 
-                    object.receiveShadow=true;
+                    object.castShadow =
+                        true;
 
-                    object.frustumCulled=false;
+                    object.receiveShadow =
+                        true;
 
-                    /*
-                     * Karena model dasar Quaternius
-                     * adalah putih, kita beri variasi
-                     * warna menggunakan material.
-                     */
-
-                    if(object.material){
-
-                        object.material =
-                            object.material.clone();
-
-                        object.material.color =
-                            new THREE.Color(
-                                horseSettings[i].color
-                            );
-
-                    }
+                    object.frustumCulled =
+                        false;
 
                 }
 
             }
+
         );
 
 
@@ -2347,7 +2573,7 @@ function createHorses(gltf){
             );
 
 
-        let action=null;
+        let action = null;
 
 
         if(gallop){
@@ -2356,6 +2582,7 @@ function createHorses(gltf){
                 mixer.clipAction(
                     gallop
                 );
+
 
             action.setLoop(
                 THREE.LoopRepeat,
@@ -2369,8 +2596,11 @@ function createHorses(gltf){
 
             id:i,
 
-            player:
-                horseSettings[i].name,
+            name:
+                defaultNames[i],
+
+            color:
+                HORSE_COLORS[i].color,
 
             model:horse,
 
@@ -2378,42 +2608,45 @@ function createHorses(gltf){
 
             action:action,
 
+            baseSpeed:9,
+
+            currentSpeed:9,
+
+            distance:0,
+
             baseX:x,
 
             baseY:y,
 
-            distance:0,
+            bobPhase:
+                Math.random() *
+                Math.PI * 2,
+
+            dustTimer:
+                Math.random() * .08,
 
             finished:false,
 
             finishTime:null,
 
-            /*
-             * Speed dasar baru dibuat setiap race.
-             */
-
-            baseSpeed:9,
-
-            currentSpeed:9,
+            variation:
+                Math.random() *
+                Math.PI * 2,
 
             stamina:100,
 
             boost:0,
 
-            rivalry:0,
-
-            overtakeCount:0,
+            boostCooldown:0,
 
             lastPosition:i,
 
-            variation:
-                Math.random()*Math.PI*2,
+            overtakeCooldown:0,
 
-            bobPhase:
-                Math.random()*Math.PI*2,
+            raceBias:
+                Math.random(),
 
-            dustTimer:
-                Math.random()*.1
+            colorApplied:false
 
         });
 
@@ -2425,136 +2658,112 @@ function createHorses(gltf){
 }
 
 
-/* =====================================================
-   NEW RACE
-===================================================== */
+/* =========================================================
+   APPLY HORSE COLOR
+========================================================= */
 
-function startNewRace(){
+function applyHorseColor(
+    horseData
+){
 
-    raceNumber++;
+    horseData.model.traverse(
 
-    localStorage.setItem(
-        "horseRaceNumber",
-        raceNumber
-    );
+        object => {
 
-
-    finishOrder=[];
-
-    raceStarted=false;
-
-    raceFinished=false;
-
-    countdownRunning=false;
+            if(
+                !object.isMesh
+            ) return;
 
 
-    /*
-     * RANDOM SPEED BARU
-     *
-     * Setiap race semua kuda
-     * mendapatkan statistik berbeda.
-     */
-
-    const performance =
-        horses.map(
-            ()=>.88+
-                Math.random()*.24
-        );
+            if(
+                !object.material
+            ) return;
 
 
-    /*
-     * Kalau TEST MODE aktif,
-     * pemenang target mendapat
-     * sedikit keuntungan performa.
-     */
+            if(
+                !object.userData.originalColor
+            ){
 
-    if(
-        testMode &&
-        forcedWinner>=0 &&
-        forcedWinner<HORSE_COUNT
-    ){
+                object.userData.originalColor =
+                    object.material.color.clone();
 
-        performance[forcedWinner] +=
-            .20;
-
-    }
+            }
 
 
-    horses.forEach(
-        (horse,index)=>{
-
-            const x =
-                (
-                    index-3.5
-                )*
-                LANE_SPACING;
+            const material =
+                object.material.clone();
 
 
-            horse.model.position.set(
-                x,
-                horse.baseY,
-                START_Z
+            material.color.set(
+                horseData.color
             );
 
 
-            horse.baseX=x;
-
-            horse.distance=0;
-
-            horse.finished=false;
-
-            horse.finishTime=null;
-
-            horse.stamina=100;
-
-            horse.boost=0;
-
-            horse.rivalry=0;
-
-            horse.overtakeCount=0;
-
-            horse.lastPosition=index;
-
-
             /*
-             * RANDOM BASE SPEED
+             * Jangan ubah material yang
+             * terlalu putih secara ekstrem.
+             * Campuran membuat detail texture
+             * tetap lebih terlihat.
              */
 
-            horse.baseSpeed =
-                (
-                    8.75+
-                    Math.random()*1.25
-                )*
-                performance[index];
+            if(
+                material.roughness !== undefined
+            ){
 
-
-            horse.currentSpeed =
-                horse.baseSpeed;
-
-
-            horse.dustTimer=.02;
-
-
-            if(horse.action){
-
-                horse.action.stop();
+                material.roughness =
+                    .82;
 
             }
+
+
+            object.material =
+                material;
+
+        }
+
+    );
+
+    horseData.colorApplied =
+        true;
+
+}
+
+
+/* =========================================================
+   PREPARE RACE
+========================================================= */
+
+function startConfiguredRace(){
+
+    const settings =
+        getHorseSettings();
+
+
+    settings.forEach(
+        (setting,index) => {
+
+            const horse =
+                horses[index];
+
+
+            horse.name =
+                setting.name;
+
+            horse.color =
+                setting.color;
+
+
+            applyHorseColor(
+                horse
+            );
 
         }
     );
 
 
-    raceStatus.textContent =
-        "GET READY";
-
-
-    startPanel.classList.remove(
+    setupPanel.classList.add(
         "hidden"
     );
-
-
-    updateLeaderboard();
 
 
     startCountdown();
@@ -2562,19 +2771,150 @@ function startNewRace(){
 }
 
 
-/* =====================================================
+/* =========================================================
+   RANDOM RACE STATS
+========================================================= */
+
+function randomizeRaceStats(){
+
+    horses.forEach(
+        horse => {
+
+            /*
+             * Setiap race benar-benar
+             * mendapatkan speed berbeda.
+             */
+
+            horse.baseSpeed =
+                THREE.MathUtils.randFloat(
+                    8.45,
+                    10.25
+                );
+
+
+            horse.currentSpeed =
+                horse.baseSpeed;
+
+
+            horse.stamina =
+                THREE.MathUtils.randFloat(
+                    82,
+                    100
+                );
+
+
+            horse.boost =
+                0;
+
+
+            horse.boostCooldown =
+                THREE.MathUtils.randFloat(
+                    .5,
+                    2.5
+                );
+
+
+            /*
+             * Bias membuat karakter
+             * tiap kuda terasa berbeda.
+             */
+
+            horse.raceBias =
+                Math.random();
+
+
+            horse.variation =
+                Math.random() *
+                Math.PI * 2;
+
+
+            horse.overtakeCooldown =
+                0;
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    COUNTDOWN
-===================================================== */
+========================================================= */
 
 function startCountdown(){
 
-    if(countdownRunning)return;
+    if(
+        countdownRunning
+    ){
+
+        return;
+
+    }
 
 
-    countdownRunning=true;
+    countdownRunning =
+        true;
 
 
-    let number=3;
+    raceStarted =
+        false;
+
+    raceFinished =
+        false;
+
+
+    finishOrder = [];
+
+
+    randomizeRaceStats();
+
+
+    horses.forEach(
+        horse => {
+
+            horse.finished =
+                false;
+
+            horse.distance =
+                0;
+
+            horse.finishTime =
+                null;
+
+            horse.model.position.z =
+                START_Z;
+
+            horse.model.position.x =
+                horse.baseX;
+
+            horse.stamina =
+                THREE.MathUtils.randFloat(
+                    82,
+                    100
+                );
+
+            horse.boost =
+                0;
+
+            horse.currentSpeed =
+                horse.baseSpeed;
+
+            if(horse.action){
+                horse.action.stop();
+            }
+
+        }
+    );
+
+
+    updateLeaderboard();
+
+
+    raceStatus.textContent =
+        "GET READY";
+
+
+    let number = 3;
 
 
     countdown.classList.add(
@@ -2582,45 +2922,52 @@ function startCountdown(){
     );
 
 
-    countdown.textContent=
+    countdown.textContent =
         number;
 
 
     const timer =
         setInterval(
+
             function(){
 
                 number--;
 
 
-                if(number>0){
+                if(number > 0){
 
-                    countdown.textContent=
+                    countdown.textContent =
                         number;
 
                 }
                 else{
 
-                    countdown.textContent=
+                    countdown.textContent =
                         "GO!";
 
 
-                    raceFlash.style.opacity="1";
+                    raceFlash.style.opacity =
+                        "1";
+
 
                     setTimeout(
-                        ()=>{
-                            raceFlash.style.opacity="0";
+                        () => {
+                            raceFlash.style.opacity =
+                                "0";
                         },
                         120
                     );
 
 
-                    raceStarted=true;
+                    raceStarted =
+                        true;
 
-                    countdownRunning=false;
+
+                    countdownRunning =
+                        false;
 
 
-                    raceStatus.textContent=
+                    raceStatus.textContent =
                         "RACING";
 
 
@@ -2630,9 +2977,11 @@ function startCountdown(){
 
 
                     horses.forEach(
-                        horse=>{
+                        horse => {
 
-                            if(horse.action){
+                            if(
+                                horse.action
+                            ){
 
                                 horse.action
                                     .reset()
@@ -2645,10 +2994,12 @@ function startCountdown(){
 
 
                     setTimeout(
-                        ()=>{
+                        () => {
+
                             countdown.classList.remove(
                                 "show"
                             );
+
                         },
                         700
                     );
@@ -2659,205 +3010,155 @@ function startCountdown(){
                 }
 
             },
+
             1000
+
         );
 
 }
 
 
-/* =====================================================
-   RIVALRY SYSTEM
-===================================================== */
+/* =========================================================
+   GET POSITION
+========================================================= */
 
-function calculateRivalry(){
+function getSortedHorses(){
 
-    const sorted =
-        [...horses].sort(
-            (a,b)=>
+    return [...horses].sort(
+
+        (a,b) => {
+
+            return (
                 a.model.position.z -
                 b.model.position.z
-        );
-
-
-    sorted.forEach(
-        (horse,index)=>{
-
-            const previous =
-                horse.lastPosition;
-
-
-            if(
-                previous!==index
-            ){
-
-                if(
-                    index<previous
-                ){
-
-                    horse.overtakeCount++;
-
-                    horse.rivalry =
-                        Math.min(
-                            100,
-                            horse.rivalry+8
-                        );
-
-                }
-
-                horse.lastPosition=
-                    index;
-
-            }
-
-
-            /*
-             * Kuda yang berada
-             * dekat dengan lawannya
-             * mendapatkan tekanan rivalry.
-             */
-
-            if(index>0){
-
-                const ahead =
-                    sorted[index-1];
-
-                const distance =
-                    Math.abs(
-                        horse.model.position.z -
-                        ahead.model.position.z
-                    );
-
-
-                if(distance<5){
-
-                    horse.rivalry =
-                        Math.min(
-                            100,
-                            horse.rivalry+
-                            .8
-                        );
-
-                }
-
-            }
+            );
 
         }
+
     );
 
 }
 
 
-/* =====================================================
-   BOOST SYSTEM
-===================================================== */
+/* =========================================================
+   RIVALRY / OVERTAKE
+========================================================= */
 
-function updateBoost(horse,delta){
+function updateRivalry(
+    horse,
+    sorted,
+    elapsed
+){
+
+    const position =
+        sorted.indexOf(horse);
+
+
+    if(position <= 0){
+        return;
+    }
+
+
+    const horseAhead =
+        sorted[position - 1];
+
+
+    if(!horseAhead){
+        return;
+    }
+
+
+    const gap =
+        horseAhead.model.position.z -
+        horse.model.position.z;
+
 
     /*
-     * Semakin tinggi rivalry,
-     * semakin besar kemungkinan boost.
+     * Karena arah race menuju Z negatif,
+     * kuda dengan Z lebih kecil berada di depan.
+     *
+     * Gap positif = lawan sedikit di depan.
      */
-
-    const chance =
-        .0025+
-        horse.rivalry*.00008;
 
 
     if(
-        Math.random()<chance &&
-        horse.stamina>35
+        gap > 0 &&
+        gap < 7 &&
+        horse.stamina > 18 &&
+        horse.overtakeCooldown <= 0
     ){
 
-        horse.boost =
-            Math.min(
-                100,
-                horse.boost+20
+        const chance =
+            .018 +
+            horse.raceBias * .025;
+
+
+        if(
+            Math.random() <
+            chance
+        ){
+
+            horse.boost =
+                THREE.MathUtils.randFloat(
+                    1.0,
+                    2.1
+                );
+
+
+            horse.stamina -=
+                THREE.MathUtils.randFloat(
+                    4,
+                    9
+                );
+
+
+            horse.overtakeCooldown =
+                1.5 +
+                Math.random() * 2;
+
+
+            showRaceEvent(
+                `${horse.name} MENYUSUL!`
             );
 
+        }
+
     }
 
 
-    if(horse.boost>0){
+    /*
+     * Kuda yang tertinggal kadang
+     * mendapat surge agar race
+     * tidak terasa monoton.
+     */
 
-        const boostPower =
-            .55+
-            horse.boost*.006;
+    if(
+        position >= 3 &&
+        gap < 18 &&
+        horse.stamina > 30
+    ){
 
-        horse.currentSpeed +=
-            boostPower;
+        if(
+            Math.random() <
+            .008
+        ){
 
+            horse.boost =
+                Math.max(
+                    horse.boost,
+                    1.0
+                );
 
-        horse.boost -=
-            18*delta;
-
-        horse.stamina -=
-            3*delta;
+        }
 
     }
 
 }
 
 
-/* =====================================================
-   STAMINA
-===================================================== */
-
-function updateStamina(horse,delta){
-
-    /*
-     * Kuda cepat lebih banyak
-     * menggunakan stamina.
-     */
-
-    const drain =
-        Math.max(
-            0,
-            horse.currentSpeed-8.5
-        )*.65;
-
-
-    horse.stamina -=
-        drain*delta;
-
-
-    if(
-        horse.stamina<15
-    ){
-
-        horse.currentSpeed -=
-            .5;
-
-    }
-
-
-    /*
-     * Sedikit recovery jika
-     * kecepatannya turun.
-     */
-
-    if(
-        horse.currentSpeed<9
-    ){
-
-        horse.stamina +=
-            .8*delta;
-
-    }
-
-
-    horse.stamina =
-        THREE.MathUtils.clamp(
-            horse.stamina,
-            0,
-            100
-        );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    UPDATE HORSES
-===================================================== */
+========================================================= */
 
 function updateHorses(
     delta,
@@ -2874,109 +3175,176 @@ function updateHorses(
     }
 
 
+    const sorted =
+        getSortedHorses();
+
+
     horses.forEach(
-        horse=>{
+        horse => {
 
             if(horse.mixer){
-
-                horse.mixer.update(
-                    delta
-                );
-
+                horse.mixer.update(delta);
             }
 
 
             if(horse.finished){
-
                 return;
-
             }
 
 
+            horse.overtakeCooldown -=
+                delta;
+
+            horse.boostCooldown -=
+                delta;
+
+
+            updateRivalry(
+                horse,
+                sorted,
+                elapsed
+            );
+
+
             /*
-             * NATURAL SPEED VARIATION
+             * Rhythm / natural speed.
              */
 
-            const wave =
+            const rhythm =
                 Math.sin(
-                    elapsed*.72+
+                    elapsed * .72 +
                     horse.variation
-                )*.20;
+                ) * .16;
 
 
             const micro =
                 Math.sin(
-                    elapsed*1.8+
-                    horse.variation*1.9
-                )*.08;
+                    elapsed * 1.7 +
+                    horse.variation * 1.9
+                ) * .06;
 
 
-            const momentum =
+            const surge =
                 Math.sin(
-                    elapsed*.21+
-                    horse.variation*2.4
-                )*.10;
-
-
-            horse.currentSpeed =
-                horse.baseSpeed+
-                wave+
-                micro+
-                momentum;
+                    elapsed * .21 +
+                    horse.variation * 2.4
+                ) * .08;
 
 
             /*
-             * RIVALRY
+             * Stamina recovery.
              */
 
-            calculateRivalry();
+            horse.stamina =
+                Math.min(
+                    100,
+                    horse.stamina +
+                    delta * .55
+                );
 
 
             /*
-             * BOOST
-             */
-
-            updateBoost(
-                horse,
-                delta
-            );
-
-
-            /*
-             * STAMINA
-             */
-
-            updateStamina(
-                horse,
-                delta
-            );
-
-
-            /*
-             * SMALL RANDOM SURGE
+             * Boost slowly disappears.
              */
 
             if(
-                Math.random()<.004 &&
-                horse.stamina>50
+                horse.boost > 0
             ){
 
-                horse.currentSpeed +=
-                    .35+
-                    Math.random()*.5;
+                horse.boost -=
+                    delta;
 
             }
 
 
             /*
-             * MOVEMENT
+             * Stamina affects base performance.
              */
 
+            const staminaFactor =
+                THREE.MathUtils.clamp(
+                    .84 +
+                    horse.stamina / 100 * .16,
+                    .84,
+                    1
+                );
+
+
+            /*
+             * Random boost/surge.
+             */
+
+            let boostPower = 0;
+
+
+            if(
+                horse.boost > 0
+            ){
+
+                boostPower =
+                    1.0 +
+                    Math.random() * .12;
+
+            }
+
+
+            /*
+             * Speed.
+             */
+
+            horse.currentSpeed =
+
+                (
+                    horse.baseSpeed +
+                    rhythm +
+                    micro +
+                    surge +
+                    boostPower
+                ) *
+                staminaFactor;
+
+
+            /*
+             * Sesekali horse mendapat
+             * acceleration pendek.
+             */
+
+            if(
+                horse.boostCooldown <= 0 &&
+                horse.stamina > 55
+            ){
+
+                if(
+                    Math.random() < .0035
+                ){
+
+                    horse.boost =
+                        THREE.MathUtils.randFloat(
+                            .5,
+                            1.25
+                        );
+
+
+                    horse.stamina -=
+                        THREE.MathUtils.randFloat(
+                            2,
+                            5
+                        );
+
+
+                    horse.boostCooldown =
+                        THREE.MathUtils.randFloat(
+                            2,
+                            5
+                        );
+
+                }
+
+            }
+
+
             const movement =
-                Math.max(
-                    0,
-                    horse.currentSpeed
-                )*
+                horse.currentSpeed *
                 delta;
 
 
@@ -2989,61 +3357,73 @@ function updateHorses(
 
 
             /*
-             * GALLOP MOTION
+             * Gallop animation.
              */
 
             const phase =
-                elapsed*
+                elapsed *
                 (
-                    7.2+
-                    horse.currentSpeed*.12
-                )+
+                    7.2 +
+                    horse.currentSpeed * .12
+                ) +
                 horse.bobPhase;
 
 
+            const gallopBob =
+                Math.sin(phase) * .045;
+
+
+            const lateral =
+                Math.sin(
+                    phase * .5
+                ) * .025;
+
+
             horse.model.position.y =
-                horse.baseY+
-                Math.sin(phase)*.045;
+                horse.baseY +
+                gallopBob;
 
-
-            /*
-             * SEDIKIT LATERAL
-             */
 
             horse.model.position.x =
-                horse.baseX+
-                Math.sin(phase*.5)*.025;
+                horse.baseX +
+                lateral;
 
 
             horse.model.rotation.z =
-                Math.sin(phase*.5)*.008;
+                Math.sin(
+                    phase * .5
+                ) * .008;
 
 
             horse.model.rotation.x =
-                Math.sin(phase)*.006;
+                Math.sin(
+                    phase
+                ) * .006;
 
-
-            /*
-             * ANIMATION SPEED
-             */
 
             if(horse.action){
 
-                horse.action
-                    .setEffectiveTimeScale(
-                        THREE.MathUtils.clamp(
-                            .84+
-                            horse.currentSpeed/10*.31,
-                            .84,
-                            1.35
-                        )
-                    );
+                horse.action.setEffectiveTimeScale(
+
+                    THREE.MathUtils.clamp(
+
+                        .84 +
+                        horse.currentSpeed /
+                        10 * .31,
+
+                        .84,
+
+                        1.3
+
+                    )
+
+                );
 
             }
 
 
             /*
-             * DUST
+             * Dust.
              */
 
             horse.dustTimer -=
@@ -3052,47 +3432,58 @@ function updateHorses(
 
             const dustInterval =
                 THREE.MathUtils.clamp(
-                    .095-
-                    (horse.currentSpeed-9)*.008,
-                    .045,
+
+                    .095 -
+                    (
+                        horse.currentSpeed -
+                        9
+                    ) * .008,
+
+                    .055,
+
                     .095
+
                 );
 
 
             if(
-                horse.dustTimer<=0
+                horse.dustTimer <= 0
             ){
 
                 spawnDust(horse);
 
                 if(
-                    Math.random()>.32
+                    Math.random() > .32
                 ){
 
                     spawnDust(horse);
 
                 }
 
+
                 horse.dustTimer =
-                    dustInterval+
-                    Math.random()*.045;
+                    dustInterval +
+                    Math.random() * .045;
 
             }
 
 
             /*
-             * FINISH
+             * Finish.
              */
 
             if(
-                horse.model.position.z<=
+                horse.model.position.z <=
                 FINISH_Z
             ){
 
-                horse.finished=true;
+                horse.finished =
+                    true;
 
-                horse.finishTime=
+
+                horse.finishTime =
                     elapsed;
+
 
                 finishOrder.push(
                     horse
@@ -3117,7 +3508,7 @@ function updateHorses(
 
 
     if(
-        finishOrder.length===
+        finishOrder.length ===
         HORSE_COUNT
     ){
 
@@ -3128,14 +3519,14 @@ function updateHorses(
 }
 
 
-/* =====================================================
-   LEADERBOARD
-===================================================== */
+/* =========================================================
+   LIVE POSITION
+========================================================= */
 
 function updateLeaderboard(){
 
     if(
-        horses.length===0
+        horses.length === 0
     ){
 
         return;
@@ -3144,18 +3535,14 @@ function updateLeaderboard(){
 
 
     const sorted =
-        [...horses].sort(
-            (a,b)=>
-                a.model.position.z -
-                b.model.position.z
-        );
+        getSortedHorses();
 
 
-    leaderRows.innerHTML="";
+    leaderRows.innerHTML = "";
 
 
     sorted.forEach(
-        (horse,index)=>{
+        (horse,index) => {
 
             const row =
                 document.createElement(
@@ -3163,11 +3550,13 @@ function updateLeaderboard(){
                 );
 
 
-            row.className=
+            row.className =
                 "lb-row";
 
 
-            if(index===0){
+            if(
+                index === 0
+            ){
 
                 row.classList.add(
                     "leading"
@@ -3176,31 +3565,40 @@ function updateLeaderboard(){
             }
 
 
-            const progress =
-                Math.min(
-                    100,
-                    horse.distance /
-                    RACE_DISTANCE*
-                    100
-                );
+            /*
+             * PENTING:
+             *
+             * Di sini memakai horse.name,
+             * bukan horse.player.
+             *
+             * Jadi nama custom dari menu
+             * langsung berubah di LIVE POSITION.
+             */
 
 
-            row.innerHTML=`
+            const displayName =
+                horse.name ||
+                `Horse ${horse.id + 1}`;
+
+
+            row.innerHTML = `
 
                 <div class="lb-left">
 
                     <div class="lb-number">
-                        ${index+1}
+                        ${index + 1}
                     </div>
 
                     <div class="lb-player">
-                        ${escapeHtml(horse.player)}
+                        ${escapeHTML(displayName)}
                     </div>
 
                 </div>
 
                 <div class="lb-distance">
-                    ${Math.round(progress)}%
+                    ${Math.round(
+                        horse.distance
+                    )}m
                 </div>
 
             `;
@@ -3216,94 +3614,128 @@ function updateLeaderboard(){
 }
 
 
-/* =====================================================
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================================
+   RACE EVENT
+========================================================= */
+
+let eventTimer = null;
+
+
+function showRaceEvent(text){
+
+    eventText.textContent =
+        text;
+
+
+    eventText.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(eventTimer);
+
+
+    eventTimer =
+        setTimeout(
+            () => {
+
+                eventText.classList.remove(
+                    "show"
+                );
+
+            },
+            900
+        );
+
+}
+
+
+/* =========================================================
    FINISH RACE
-===================================================== */
+========================================================= */
 
 function finishRace(){
 
-    raceFinished=true;
+    raceFinished =
+        true;
 
-    raceStarted=false;
+
+    raceStarted =
+        false;
+
+
+    raceStatus.textContent =
+        "FINISH";
+
+
+    finalList.innerHTML =
+        "";
 
 
     /*
-     * Pastikan semua kuda
-     * masuk ranking.
+     * Pastikan semua yang sudah
+     * finish masuk.
+     *
+     * Tidak lagi menggunakan
+     * Player 4 atau player default.
      */
 
-    const remaining =
+    const finalOrder =
+        [...finishOrder];
+
+
+    /*
+     * Safety:
+     * kalau ada sesuatu yang belum
+     * tercatat, masukkan berdasarkan
+     * posisi terakhir.
+     */
+
+    if(
+        finalOrder.length <
+        HORSE_COUNT
+    ){
+
         horses
             .filter(
                 horse =>
-                    !finishOrder.includes(
+                    !finalOrder.includes(
                         horse
                     )
             )
             .sort(
-                (a,b)=>
+                (a,b) =>
                     a.model.position.z -
                     b.model.position.z
+            )
+            .forEach(
+                horse =>
+                    finalOrder.push(
+                        horse
+                    )
             );
-
-
-    finishOrder.push(
-        ...remaining
-    );
-
-
-    /*
-     * TEST MODE SAFETY
-     *
-     * Jika target winner belum
-     * masuk posisi pertama,
-     * kita hanya menggunakannya
-     * sebagai penanda hasil testing.
-     *
-     * Dalam race normal tidak
-     * ada forced winner.
-     */
-
-
-    if(
-        testMode &&
-        forcedWinner>=0
-    ){
-
-        const target =
-            horses[forcedWinner];
-
-        const index =
-            finishOrder.indexOf(
-                target
-            );
-
-
-        if(index>0){
-
-            finishOrder.splice(
-                index,
-                1
-            );
-
-            finishOrder.unshift(
-                target
-            );
-
-        }
 
     }
 
 
-    raceStatus.textContent=
-        "FINISH";
-
-
-    finalList.innerHTML="";
-
-
-    finishOrder.forEach(
-        (horse,index)=>{
+    finalOrder.forEach(
+        (horse,index) => {
 
             const row =
                 document.createElement(
@@ -3311,11 +3743,13 @@ function finishRace(){
                 );
 
 
-            row.className=
+            row.className =
                 "final-row";
 
 
-            if(index===0){
+            if(
+                index === 0
+            ){
 
                 row.classList.add(
                     "first"
@@ -3324,19 +3758,36 @@ function finishRace(){
             }
 
 
-            row.innerHTML=`
+            /*
+             * PENTING:
+             * Race Finished juga memakai
+             * nama custom horse.name.
+             */
 
-                <span>
-                    ${index+1}.
-                    ${escapeHtml(horse.player)}
-                </span>
+            const displayName =
+                horse.name ||
+                `Horse ${horse.id + 1}`;
+
+
+            row.innerHTML = `
 
                 <span>
                     ${
-                        index===0
-                        ? "🏆"
+                        index === 0
+                        ? "🏆 "
                         : ""
                     }
+
+                    ${index + 1}.
+                    ${escapeHTML(
+                        displayName
+                    )}
+
+                </span>
+
+                <span class="final-speed">
+                    ${horse.baseSpeed.toFixed(2)}
+                    m/s
                 </span>
 
             `;
@@ -3350,7 +3801,13 @@ function finishRace(){
     );
 
 
+    /*
+     * Tampilkan hasil sedikit
+     * setelah race selesai.
+     */
+
     setTimeout(
+
         function(){
 
             finishPanel.classList.add(
@@ -3358,21 +3815,147 @@ function finishRace(){
             );
 
         },
+
         1000
+
     );
 
 }
 
 
-/* =====================================================
-   CAMERA
-   SIDE-TOP CINEMATIC
-===================================================== */
+/* =========================================================
+   RESTART
+========================================================= */
+
+function restartRace(){
+
+    finishPanel.classList.remove(
+        "show"
+    );
+
+
+    horses.forEach(
+        (horse,index) => {
+
+            const x =
+                (
+                    index -
+                    3.5
+                ) *
+                LANE_SPACING;
+
+
+            horse.model.position.set(
+
+                x,
+
+                horse.baseY,
+
+                START_Z
+
+            );
+
+
+            horse.model.rotation.y =
+                Math.PI;
+
+
+            horse.distance =
+                0;
+
+
+            horse.baseX =
+                x;
+
+
+            horse.dustTimer =
+                .02;
+
+
+            horse.finished =
+                false;
+
+
+            horse.finishTime =
+                null;
+
+
+            horse.stamina =
+                100;
+
+
+            horse.boost =
+                0;
+
+
+            horse.boostCooldown =
+                0;
+
+
+            horse.overtakeCooldown =
+                0;
+
+
+            if(horse.action){
+
+                horse.action.stop();
+
+            }
+
+        }
+    );
+
+
+    finishOrder = [];
+
+
+    raceStarted =
+        false;
+
+
+    raceFinished =
+        false;
+
+
+    countdownRunning =
+        false;
+
+
+    raceStatus.textContent =
+        "GET READY";
+
+
+    startPanel.classList.remove(
+        "hidden"
+    );
+
+
+    updateLeaderboard();
+
+
+    setTimeout(
+
+        function(){
+
+            startCountdown();
+
+        },
+
+        400
+
+    );
+
+}
+
+
+/* =========================================================
+   CINEMATIC SIDE-TOP CAMERA
+========================================================= */
 
 function updateCamera(){
 
     if(
-        horses.length===0
+        horses.length === 0
     ){
 
         return;
@@ -3380,25 +3963,29 @@ function updateCamera(){
     }
 
 
-    const sorted =
-        [...horses].sort(
-            (a,b)=>
-                a.model.position.z -
-                b.model.position.z
+    const activeHorses =
+        horses.filter(
+            horse =>
+                !horse.finished
         );
 
 
-    const leader =
-        sorted[0];
+    const group =
+        activeHorses.length
+        ? activeHorses
+        : horses;
 
 
-    let averageX=0;
+    let averageX = 0;
 
-    let averageZ=0;
+    let averageZ = 0;
+
+    let leaderZ =
+        Infinity;
 
 
-    horses.forEach(
-        horse=>{
+    group.forEach(
+        horse => {
 
             averageX +=
                 horse.model.position.x;
@@ -3406,95 +3993,121 @@ function updateCamera(){
             averageZ +=
                 horse.model.position.z;
 
+            leaderZ =
+                Math.min(
+                    leaderZ,
+                    horse.model.position.z
+                );
+
         }
     );
 
 
     averageX /=
-        horses.length;
+        group.length;
+
 
     averageZ /=
-        horses.length;
+        group.length;
 
 
     /*
-     * SIDE-TOP
-     *
-     * Kamera tidak berada tepat
-     * di belakang kuda.
+     * Progress race.
      */
 
-    const progress =
+    const raceProgress =
         THREE.MathUtils.clamp(
+
             (
-                START_Z-
+                START_Z -
                 averageZ
-            )/
+            ) /
             (
-                START_Z-
+                START_Z -
                 FINISH_Z
             ),
+
             0,
             1
+
         );
+
+
+    /*
+     * =====================================================
+     * SIDE-TOP CINEMATIC
+     *
+     * Kamera berada di samping
+     * dan sedikit di atas lintasan.
+     *
+     * Tidak lagi mengikuti dari
+     * belakang kuda.
+     * =====================================================
+     */
 
 
     const side =
-        THREE.MathUtils.lerp(
-            18,
-            15,
-            progress
-        );
+        31;
 
 
     const height =
         THREE.MathUtils.lerp(
+            18,
             14,
-            11,
-            progress
+            raceProgress
         );
 
 
-    const back =
+    const forward =
         THREE.MathUtils.lerp(
-            18,
-            14,
-            progress
+            5,
+            8,
+            raceProgress
         );
 
 
     const cinematicSway =
         Math.sin(
-            clock.elapsedTime*.32
-        )*.7;
+            clock.elapsedTime * .25
+        ) * .8;
 
 
     cameraTarget.set(
 
-        averageX+
-        side+
+        averageX +
+        side +
         cinematicSway,
 
         height,
 
-        averageZ+
-        back
+        averageZ +
+        forward
 
     );
 
 
     camera.position.lerp(
+
         cameraTarget,
-        .045
+
+        .055
+
     );
 
+
+    /*
+     * Camera melihat ke tengah
+     * rombongan kuda.
+     */
 
     cameraLook.set(
 
         averageX,
-        1.8,
-        averageZ-
-        10
+
+        1.5,
+
+        averageZ -
+        3
 
     );
 
@@ -3505,22 +4118,55 @@ function updateCamera(){
 
 
     /*
-     * FOV DINAMIS
+     * Cinematic shake.
+     */
+
+    cameraShake =
+        THREE.MathUtils.lerp(
+
+            cameraShake,
+
+            raceStarted
+            ? .025
+            : 0,
+
+            .06
+
+        );
+
+
+    camera.position.x +=
+        Math.sin(
+            clock.elapsedTime * 18
+        ) *
+        cameraShake;
+
+
+    camera.position.y +=
+        Math.cos(
+            clock.elapsedTime * 15
+        ) *
+        cameraShake *
+        .5;
+
+
+    /*
+     * Dynamic FOV.
      */
 
     const targetFov =
         THREE.MathUtils.lerp(
             53,
-            60,
-            progress
+            59,
+            raceProgress
         );
 
 
     camera.fov +=
         (
-            targetFov-
+            targetFov -
             camera.fov
-        )*.035;
+        ) * .035;
 
 
     camera.updateProjectionMatrix();
@@ -3528,29 +4174,34 @@ function updateCamera(){
 }
 
 
-/* =====================================================
+/* =========================================================
    RESIZE
-===================================================== */
+========================================================= */
 
 function onResize(){
 
     camera.aspect =
-        window.innerWidth/
+        window.innerWidth /
         window.innerHeight;
+
 
     camera.updateProjectionMatrix();
 
+
     renderer.setSize(
+
         window.innerWidth,
+
         window.innerHeight
+
     );
 
 }
 
 
-/* =====================================================
-   ANIMATE
-===================================================== */
+/* =========================================================
+   ANIMATION LOOP
+========================================================= */
 
 function animate(){
 
@@ -3561,8 +4212,11 @@ function animate(){
 
     const delta =
         Math.min(
+
             clock.getDelta(),
+
             .05
+
         );
 
 
@@ -3587,16 +4241,15 @@ function animate(){
 }
 
 
-/* =====================================================
+/* =========================================================
    START
-===================================================== */
-
-buildMenu();
+========================================================= */
 
 init();
 
 </script>
 
 </body>
+
 </html>
 ```
