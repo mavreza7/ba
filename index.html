@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Horse Racing 3D — V9</title>
+<title>Horse Racing 3D — V9 Final</title>
 
 <style>
 *{
@@ -95,9 +95,11 @@ canvas{
     justify-content:center;
     padding:20px;
     background:
-        radial-gradient(circle at center,
-        rgba(40,85,50,.95),
-        rgba(2,8,4,.98));
+        radial-gradient(
+            circle at center,
+            rgba(40,85,50,.95),
+            rgba(2,8,4,.98)
+        );
     overflow:auto;
 }
 
@@ -258,18 +260,9 @@ canvas{
     margin-bottom:12px;
 }
 
-.secret-select{
-    width:100%;
-    padding:9px;
-    color:white;
-    background:#152017;
-    border:0;
-    border-radius:8px;
-}
-
+.secret-select,
 .secret-games{
     width:100%;
-    margin-top:7px;
     padding:9px;
     color:white;
     background:#152017;
@@ -325,6 +318,20 @@ canvas{
 
 #countdown.show{
     opacity:1;
+}
+
+/* =========================
+   RACE FLASH
+========================= */
+
+#raceFlash{
+    position:fixed;
+    inset:0;
+    z-index:25;
+    pointer-events:none;
+    opacity:0;
+    background:rgba(255,255,255,.3);
+    transition:opacity .08s linear;
 }
 
 /* =========================
@@ -478,9 +485,11 @@ canvas{
     border-radius:25px;
     border:1px solid rgba(255,255,255,.15);
     background:
-        linear-gradient(145deg,
-        rgba(30,45,33,.97),
-        rgba(5,12,7,.97));
+        linear-gradient(
+            145deg,
+            rgba(30,45,33,.97),
+            rgba(5,12,7,.97)
+        );
 }
 
 .finish-trophy{
@@ -545,15 +554,6 @@ canvas{
             transparent 45%,
             rgba(0,0,0,.25) 100%
         );
-}
-
-#raceFlash{
-    position:fixed;
-    inset:0;
-    z-index:25;
-    pointer-events:none;
-    opacity:0;
-    background:rgba(255,255,255,.3);
 }
 
 #raceVignette{
@@ -622,38 +622,20 @@ canvas{
     }
 }
 </script>
-
 </head>
 
 <body>
 
-<!-- =========================
-     LOADING
-========================= -->
-
 <div id="loading">
-
-    <div class="loading-title">
-        HORSE RACING
-    </div>
-
-    <div class="loading-subtitle">
-        Preparing race...
-    </div>
+    <div class="loading-title">HORSE RACING</div>
+    <div class="loading-subtitle">Preparing race...</div>
 
     <div class="loading-bar">
         <div id="loading-progress"></div>
     </div>
 
-    <div class="loading-percent">
-        0%
-    </div>
-
+    <div class="loading-percent">0%</div>
 </div>
-
-<!-- =========================
-     MENU KUDA
-========================= -->
 
 <div id="setupPanel">
 
@@ -677,11 +659,7 @@ canvas{
 
 </div>
 
-<!-- =========================
-     SECRET BUTTON
-========================= -->
-
-<button id="secretButton" title="..."></button>
+<button id="secretButton" title="Secret Control"></button>
 
 <div id="secretPanel">
 
@@ -722,17 +700,10 @@ canvas{
 
 </div>
 
-<!-- =========================
-     COUNTDOWN
-========================= -->
+<div id="countdown">3</div>
 
-<div id="countdown">
-    3
-</div>
-
-<!-- =========================
-     TOP HUD
-========================= -->
+<!-- FIX: ELEMENT INI SEBELUMNYA HILANG -->
+<div id="raceFlash"></div>
 
 <div id="topHud">
 
@@ -740,18 +711,11 @@ canvas{
         🏇 HORSE RACING
     </div>
 
-    <div
-        class="race-status"
-        id="raceStatus"
-    >
+    <div class="race-status" id="raceStatus">
         Preparing race...
     </div>
 
 </div>
-
-<!-- =========================
-     LEADERBOARD
-========================= -->
 
 <div id="leaderboard">
 
@@ -763,17 +727,9 @@ canvas{
 
 </div>
 
-<!-- =========================
-     START PANEL
-========================= -->
-
 <div id="startPanel">
     8 HORSES • AUTOMATIC RACE
 </div>
-
-<!-- =========================
-     FINISH PANEL
-========================= -->
 
 <div id="finishPanel">
 
@@ -791,10 +747,7 @@ canvas{
             Final Result
         </div>
 
-        <div
-            class="final-list"
-            id="finalList"
-        ></div>
+        <div class="final-list" id="finalList"></div>
 
         <button id="againButton">
             🔄 RACE AGAIN
@@ -803,6 +756,9 @@ canvas{
     </div>
 
 </div>
+
+<div id="cinematicVignette"></div>
+<div id="raceVignette"></div>
 
 <script type="module">
 
@@ -899,6 +855,11 @@ const startRaceButton =
 const againButton =
     document.getElementById("againButton");
 
+/*
+    FIX UTAMA:
+    Elemen sekarang benar-benar ada di HTML.
+*/
+
 const raceFlash =
     document.getElementById("raceFlash");
 
@@ -947,6 +908,7 @@ const horseChoices = [
         type:"Cream",
         color:"#d8c39a"
     }
+
 ];
 
 /* =====================================================
@@ -972,7 +934,7 @@ function createHorseMenu(){
         let options = "";
 
         horseChoices.forEach(
-            (choice,index)=>{
+            choice=>{
 
                 options += `
                     <option value="${choice.color}">
@@ -1006,9 +968,7 @@ function createHorseMenu(){
 
             <div class="color-row">
 
-                <span>
-                    Warna
-                </span>
+                <span>Warna</span>
 
                 <input
                     type="color"
@@ -1018,7 +978,6 @@ function createHorseMenu(){
                 >
 
             </div>
-
         `;
 
         horseGrid.appendChild(box);
@@ -1032,6 +991,7 @@ function createHorseMenu(){
             select.addEventListener(
                 "change",
                 ()=>{
+
                     const color =
                         select.value;
 
@@ -1043,8 +1003,10 @@ function createHorseMenu(){
                             `.horse-color[data-index="${index}"]`
                         );
 
-                    picker.value =
-                        color;
+                    if(picker){
+                        picker.value = color;
+                    }
+
                 }
             );
 
@@ -1066,23 +1028,27 @@ function getHorseConfig(){
         i++
     ){
 
-        const name =
+        const nameElement =
             document.querySelector(
                 `.horse-name[data-index="${i}"]`
-            ).value.trim();
+            );
 
-        const color =
+        const colorElement =
             document.querySelector(
                 `.horse-color[data-index="${i}"]`
-            ).value;
+            );
 
         result.push({
 
             player:
-                name ||
+                nameElement?.value.trim()
+                ||
                 `Horse ${i+1}`,
 
-            color:color
+            color:
+                colorElement?.value
+                ||
+                "#ffffff"
 
         });
 
@@ -1107,8 +1073,6 @@ function init(){
     scene.background =
         new THREE.Color(0x8bc7e8);
 
-    /* CAMERA */
-
     camera =
         new THREE.PerspectiveCamera(
 
@@ -1127,8 +1091,6 @@ function init(){
         17,
         18
     );
-
-    /* RENDERER */
 
     renderer =
         new THREE.WebGLRenderer({
@@ -1172,13 +1134,9 @@ function init(){
     );
 
     createLights();
-
     createWorld();
-
     createClouds();
-
     createDustSystem();
-
     createHorseMenu();
 
     loadHorse();
@@ -1261,8 +1219,6 @@ function createLights(){
 
 function createWorld(){
 
-    /* GRASS */
-
     const grass =
         new THREE.Mesh(
 
@@ -1272,11 +1228,8 @@ function createWorld(){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0x4c9f50,
-
                 roughness:1
-
             })
 
         );
@@ -1288,8 +1241,6 @@ function createWorld(){
 
     scene.add(grass);
 
-    /* ROAD BASE */
-
     const road =
         new THREE.Mesh(
 
@@ -1299,11 +1250,8 @@ function createWorld(){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0x8a6248,
-
                 roughness:.98
-
             })
 
         );
@@ -1318,8 +1266,6 @@ function createWorld(){
 
     scene.add(road);
 
-    /* ROAD CENTER */
-
     const roadCenter =
         new THREE.Mesh(
 
@@ -1329,11 +1275,8 @@ function createWorld(){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0x76523e,
-
                 roughness:1
-
             })
 
         );
@@ -1345,8 +1288,6 @@ function createWorld(){
         .035;
 
     scene.add(roadCenter);
-
-    /* LANE LINES */
 
     for(
         let i=-4;
@@ -1390,17 +1331,12 @@ function createWorld(){
     createRoadDetails();
 
     createFence(-17);
-
     createFence(17);
 
     createStartLine();
-
     createFinishLine();
-
     createFinishArch();
-
     createTrees();
-
     createMountains();
 
 }
@@ -1471,8 +1407,6 @@ function createRoadDetails(){
 
     }
 
-    /* RUMPUT TEPI JALAN */
-
     for(
         let i=0;
         i<180;
@@ -1495,9 +1429,7 @@ function createRoadDetails(){
                 ),
 
                 new THREE.MeshStandardMaterial({
-
                     color:0x2f7837
-
                 })
 
             );
@@ -1545,9 +1477,7 @@ function createFence(x){
                 ),
 
                 new THREE.MeshStandardMaterial({
-
                     color:0xffffff
-
                 })
 
             );
@@ -1563,7 +1493,7 @@ function createFence(x){
         scene.add(post);
 
         for(
-            let h of [0.7,1.1]
+            const h of [0.7,1.1]
         ){
 
             const rail =
@@ -1576,9 +1506,7 @@ function createFence(x){
                     ),
 
                     new THREE.MeshStandardMaterial({
-
                         color:0xffffff
-
                     })
 
                 );
@@ -1598,7 +1526,7 @@ function createFence(x){
 }
 
 /* =====================================================
-   START LINE
+   START / FINISH
 ===================================================== */
 
 function createStartLine(){
@@ -1613,9 +1541,7 @@ function createStartLine(){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0xffffff
-
             })
 
         );
@@ -1630,10 +1556,6 @@ function createStartLine(){
 
 }
 
-/* =====================================================
-   FINISH LINE
-===================================================== */
-
 function createFinishLine(){
 
     const line =
@@ -1646,9 +1568,7 @@ function createFinishLine(){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0xffffff
-
             })
 
         );
@@ -1663,30 +1583,21 @@ function createFinishLine(){
 
 }
 
-/* =====================================================
-   FINISH ARCH
-===================================================== */
-
 function createFinishArch(){
 
     const material =
         new THREE.MeshStandardMaterial({
-
             color:0xffffff
-
         });
 
     const left =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(
                 .5,
                 7,
                 .5
             ),
-
             material
-
         );
 
     left.position.set(
@@ -1726,8 +1637,6 @@ function createFinishArch(){
 
     scene.add(top);
 
-    /* FINISH SIGN */
-
     const sign =
         new THREE.Mesh(
 
@@ -1738,9 +1647,7 @@ function createFinishArch(){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0x17231a
-
             })
 
         );
@@ -1792,10 +1699,6 @@ function createTrees(){
 
 }
 
-/* =====================================================
-   TREE
-===================================================== */
-
 function createTree(x,z){
 
     const scale =
@@ -1813,9 +1716,7 @@ function createTree(x,z){
             ),
 
             new THREE.MeshStandardMaterial({
-
                 color:0x60452e
-
             })
 
         );
@@ -1888,12 +1789,8 @@ function createMountains(){
                 ),
 
                 new THREE.MeshStandardMaterial({
-
-                    color:
-                        0x668568,
-
+                    color:0x668568,
                     roughness:1
-
                 })
 
             );
@@ -1997,12 +1894,9 @@ function createClouds(){
 
         );
 
-        const scale =
-            .7+
-            Math.random()*1.5;
-
         cloud.scale.setScalar(
-            scale
+            .7+
+            Math.random()*1.5
         );
 
         cloud.userData.speed =
@@ -2016,10 +1910,6 @@ function createClouds(){
     }
 
 }
-
-/* =====================================================
-   UPDATE CLOUDS
-===================================================== */
 
 function updateClouds(delta){
 
@@ -2132,10 +2022,6 @@ function createDustSystem(){
 
 }
 
-/* =====================================================
-   SPAWN DUST
-===================================================== */
-
 function spawnDust(horse){
 
     const p =
@@ -2183,10 +2069,6 @@ function spawnDust(horse){
 
 }
 
-/* =====================================================
-   UPDATE DUST
-===================================================== */
-
 function updateDust(delta){
 
     if(!dustMesh)return;
@@ -2208,9 +2090,7 @@ function updateDust(delta){
             p.life+=delta;
 
             p.x+=p.vx*delta;
-
             p.y+=p.vy*delta;
-
             p.z+=p.vz*delta;
 
             p.vy-=1.15*delta;
@@ -2294,8 +2174,14 @@ function loadHorse(){
 
             setTimeout(
                 ()=>{
-                    loading.classList.add("hide");
-                    setupPanel.style.display="flex";
+
+                    loading.classList.add(
+                        "hide"
+                    );
+
+                    setupPanel.style.display =
+                        "flex";
+
                 },
                 500
             );
@@ -2323,7 +2209,10 @@ function loadHorse(){
 
         error=>{
 
-            console.error(error);
+            console.error(
+                "GLB ERROR:",
+                error
+            );
 
             document.querySelector(
                 ".loading-title"
@@ -2353,8 +2242,8 @@ function createHorses(gltf){
         gltf.animations.find(
             animation=>
                 animation.name
-                .toLowerCase()
-                .trim()==="gallop"
+                    .toLowerCase()
+                    .trim()==="gallop"
         );
 
     if(!gallop){
@@ -2363,8 +2252,8 @@ function createHorses(gltf){
             gltf.animations.find(
                 animation=>
                     animation.name
-                    .toLowerCase()
-                    .includes("gallop")
+                        .toLowerCase()
+                        .includes("gallop")
             );
 
     }
@@ -2386,7 +2275,9 @@ function createHorses(gltf){
         scene.add(horse);
 
         horse.scale.set(
-            1,1,1
+            1,
+            1,
+            1
         );
 
         horse.updateMatrixWorld(true);
@@ -2406,7 +2297,8 @@ function createHorses(gltf){
         if(size.y>.001){
 
             const scale =
-                TARGET_HEIGHT/size.y;
+                TARGET_HEIGHT/
+                size.y;
 
             horse.scale.set(
                 scale,
@@ -2441,10 +2333,6 @@ function createHorses(gltf){
         horse.rotation.y =
             Math.PI;
 
-        /* =========================
-           COLOR
-        ========================= */
-
         applyHorseColor(
             horse,
             configs[i].color
@@ -2458,9 +2346,7 @@ function createHorses(gltf){
                 ){
 
                     object.castShadow=true;
-
                     object.receiveShadow=true;
-
                     object.frustumCulled=false;
 
                 }
@@ -2547,13 +2433,12 @@ function createHorses(gltf){
     }
 
     updateSecretHorseList();
-
     updateLeaderboard();
 
 }
 
 /* =====================================================
-   COLOR HORSE
+   COLOR
 ===================================================== */
 
 function applyHorseColor(
@@ -2594,11 +2479,6 @@ function applyHorseColor(
 
                     }
 
-                    /*
-                    Sedikit mempertahankan
-                    detail tekstur/model.
-                    */
-
                     material.color.multiply(
                         target
                     );
@@ -2612,7 +2492,7 @@ function applyHorseColor(
 }
 
 /* =====================================================
-   START SELECTED RACE
+   START
 ===================================================== */
 
 function startSelectedRace(){
@@ -2625,7 +2505,7 @@ function startSelectedRace(){
 }
 
 /* =====================================================
-   RANDOM RACE STATS
+   RACE STATS
 ===================================================== */
 
 function prepareRaceStats(){
@@ -2636,19 +2516,8 @@ function prepareRaceStats(){
                 Math.random()*1.8
         );
 
-    const sorted =
-        [...randomValues]
-        .sort(
-            (a,b)=>b-a
-        );
-
     horses.forEach(
         (horse,index)=>{
-
-            /*
-            Random base speed setiap race.
-            Tidak lagi Player 4 selalu unggul.
-            */
 
             horse.baseSpeed =
                 randomValues[index];
@@ -2664,31 +2533,18 @@ function prepareRaceStats(){
                 60+
                 Math.random()*40;
 
-            horse.rivalry =
-                0;
-
-            horse.overtakeCount =
-                0;
-
-            horse.targetBoost =
-                0;
+            horse.rivalry=0;
+            horse.overtakeCount=0;
+            horse.targetBoost=0;
 
         }
     );
-
-    /*
-    Tentukan target pemenang secara random.
-    */
 
     let winnerIndex =
         Math.floor(
             Math.random()*
             HORSE_COUNT
         );
-
-    /*
-    Secret winner override.
-    */
 
     if(
         raceWinnerOverride !== null &&
@@ -2699,14 +2555,6 @@ function prepareRaceStats(){
             raceWinnerOverride;
 
     }
-
-    /*
-    Simpan target internal.
-    Tidak langsung membuatnya
-    menang secara curang.
-    Sistem tetap membuat
-    persaingan dan perubahan posisi.
-    */
 
     horses.forEach(
         horse=>{
@@ -2725,7 +2573,7 @@ function prepareRaceStats(){
 }
 
 /* =====================================================
-   START NEW RACE
+   NEW RACE
 ===================================================== */
 
 function startNewRace(){
@@ -2737,9 +2585,7 @@ function startNewRace(){
     finishOrder=[];
 
     raceStarted=false;
-
     raceFinished=false;
-
     countdownRunning=false;
 
     prepareRaceStats();
@@ -2768,16 +2614,11 @@ function startNewRace(){
             );
 
             horse.distance=0;
-
             horse.finished=false;
-
             horse.finishTime=null;
-
             horse.laneChange=0;
 
-            if(
-                horse.action
-            ){
+            if(horse.action){
 
                 horse.action.stop();
 
@@ -2808,9 +2649,7 @@ function startNewRace(){
 
 function startCountdown(){
 
-    if(
-        countdownRunning
-    )return;
+    if(countdownRunning)return;
 
     countdownRunning=true;
 
@@ -2820,7 +2659,7 @@ function startCountdown(){
         "show"
     );
 
-    countdown.textContent=
+    countdown.textContent =
         number;
 
     const timer =
@@ -2829,35 +2668,44 @@ function startCountdown(){
 
                 number--;
 
-                if(
-                    number>0
-                ){
+                if(number>0){
 
-                    countdown.textContent=
+                    countdown.textContent =
                         number;
 
                 }
                 else{
 
-                    countdown.textContent=
+                    countdown.textContent =
                         "GO!";
 
-                    raceFlash.style.opacity=
-                        "1";
+                    /*
+                    FIX:
+                    Cek raceFlash sebelum
+                    mengakses .style.
+                    */
 
-                    setTimeout(
-                        ()=>{
-                            raceFlash.style.opacity=
-                                "0";
-                        },
-                        120
-                    );
+                    if(raceFlash){
+
+                        raceFlash.style.opacity =
+                            "1";
+
+                        setTimeout(
+                            ()=>{
+
+                                raceFlash.style.opacity =
+                                    "0";
+
+                            },
+                            120
+                        );
+
+                    }
 
                     raceStarted=true;
-
                     countdownRunning=false;
 
-                    raceStatus.textContent=
+                    raceStatus.textContent =
                         "RACING";
 
                     startPanel.classList.add(
@@ -2867,9 +2715,7 @@ function startCountdown(){
                     horses.forEach(
                         horse=>{
 
-                            if(
-                                horse.action
-                            ){
+                            if(horse.action){
 
                                 horse.action
                                     .reset()
@@ -2882,9 +2728,11 @@ function startCountdown(){
 
                     setTimeout(
                         ()=>{
+
                             countdown.classList.remove(
                                 "show"
                             );
+
                         },
                         600
                     );
@@ -2919,10 +2767,6 @@ function updateHorses(
 
     }
 
-    /*
-    Cari posisi relatif.
-    */
-
     const ranking =
         [...horses]
         .sort(
@@ -2942,22 +2786,11 @@ function updateHorses(
 
             }
 
-            if(
-                horse.finished
-            ){
+            if(horse.finished){
 
                 return;
 
             }
-
-            const rank =
-                ranking.indexOf(horse);
-
-            /*
-            ========================
-            RIVALRY
-            ========================
-            */
 
             let rivalNearby=false;
 
@@ -2979,9 +2812,7 @@ function updateHorses(
                             other.distance
                         );
 
-                    if(
-                        distance<13
-                    ){
+                    if(distance<13){
 
                         rivalNearby=true;
 
@@ -2990,9 +2821,7 @@ function updateHorses(
                 }
             );
 
-            if(
-                rivalNearby
-            ){
+            if(rivalNearby){
 
                 horse.rivalry =
                     Math.min(
@@ -3013,12 +2842,6 @@ function updateHorses(
 
             }
 
-            /*
-            ========================
-            STAMINA
-            ========================
-            */
-
             const staminaDrain =
                 .25+
                 horse.currentSpeed*
@@ -3031,10 +2854,6 @@ function updateHorses(
                     staminaDrain*
                     delta
                 );
-
-            /*
-            Recovery ketika melambat.
-            */
 
             if(
                 horse.currentSpeed<
@@ -3050,12 +2869,6 @@ function updateHorses(
 
             }
 
-            /*
-            ========================
-            RANDOM BOOST
-            ========================
-            */
-
             if(
                 horse.rivalry>.55 &&
                 horse.boost>10 &&
@@ -3069,17 +2882,10 @@ function updateHorses(
                 horse.boost =
                     Math.max(
                         0,
-                        horse.boost-
-                        12
+                        horse.boost-12
                     );
 
             }
-
-            /*
-            ========================
-            NATURAL SPEED
-            ========================
-            */
 
             const wave =
                 Math.sin(
@@ -3094,8 +2900,7 @@ function updateHorses(
                 )*.11;
 
             const rivalryPush =
-                horse.rivalry*
-                .35;
+                horse.rivalry*.35;
 
             const staminaPenalty =
                 horse.stamina<20
@@ -3112,22 +2917,9 @@ function updateHorses(
                     delta*1.8
                 );
 
-            /*
-            ========================
-            TARGET WINNER
-            ========================
-            */
-
             let targetAdjustment=0;
 
-            if(
-                horse.isTargetWinner
-            ){
-
-                /*
-                Hanya sedikit keuntungan.
-                Race tetap terlihat natural.
-                */
+            if(horse.isTargetWinner){
 
                 targetAdjustment =
                     Math.sin(
@@ -3153,22 +2945,12 @@ function updateHorses(
                     11.8
                 );
 
-            /*
-            ========================
-            OVERTAKE
-            ========================
-            */
-
             if(
                 rivalNearby &&
                 Math.random()<.012
             ){
 
                 horse.overtakeCount++;
-
-                /*
-                Pindah sedikit ke lane.
-                */
 
                 const direction =
                     Math.random()<.5
@@ -3177,8 +2959,10 @@ function updateHorses(
 
                 horse.laneChange +=
                     direction*
-                    (.25+
-                    Math.random()*.35);
+                    (
+                        .25+
+                        Math.random()*.35
+                    );
 
                 horse.laneChange =
                     THREE.MathUtils.clamp(
@@ -3192,12 +2976,6 @@ function updateHorses(
             horse.laneChange *=
                 .985;
 
-            /*
-            ========================
-            MOVEMENT
-            ========================
-            */
-
             const movement =
                 horse.currentSpeed*
                 delta;
@@ -3207,12 +2985,6 @@ function updateHorses(
 
             horse.distance +=
                 movement;
-
-            /*
-            ========================
-            SIDE MOVEMENT
-            ========================
-            */
 
             const phase =
                 elapsed*
@@ -3226,9 +2998,7 @@ function updateHorses(
                 Math.sin(phase)*.045;
 
             const lateral =
-                Math.sin(
-                    phase*.5
-                )*.025;
+                Math.sin(phase*.5)*.025;
 
             horse.model.position.y =
                 horse.baseY+
@@ -3238,12 +3008,6 @@ function updateHorses(
                 horse.baseX+
                 horse.laneChange+
                 lateral;
-
-            /*
-            ========================
-            ANIMATION
-            ========================
-            */
 
             horse.model.rotation.z =
                 Math.sin(
@@ -3255,9 +3019,7 @@ function updateHorses(
                     phase
                 )*.006;
 
-            if(
-                horse.action
-            ){
+            if(horse.action){
 
                 horse.action.setEffectiveTimeScale(
 
@@ -3272,12 +3034,6 @@ function updateHorses(
                 );
 
             }
-
-            /*
-            ========================
-            DUST
-            ========================
-            */
 
             horse.dustTimer -=
                 delta;
@@ -3302,12 +3058,6 @@ function updateHorses(
 
             }
 
-            /*
-            ========================
-            FINISH
-            ========================
-            */
-
             if(
                 horse.model.position.z<=
                 FINISH_Z
@@ -3315,16 +3065,14 @@ function updateHorses(
 
                 horse.finished=true;
 
-                horse.finishTime=
+                horse.finishTime =
                     elapsed;
 
                 finishOrder.push(
                     horse
                 );
 
-                if(
-                    horse.action
-                ){
+                if(horse.action){
 
                     horse.action.stop();
 
@@ -3356,9 +3104,7 @@ function updateHorses(
 
 function updateLeaderboard(){
 
-    if(
-        horses.length===0
-    ){
+    if(horses.length===0){
 
         return;
 
@@ -3382,12 +3128,10 @@ function updateLeaderboard(){
                     "div"
                 );
 
-            row.className=
+            row.className =
                 "lb-row";
 
-            if(
-                index===0
-            ){
+            if(index===0){
 
                 row.classList.add(
                     "leading"
@@ -3395,7 +3139,7 @@ function updateLeaderboard(){
 
             }
 
-            row.innerHTML=`
+            row.innerHTML = `
 
                 <div class="lb-left">
 
@@ -3431,16 +3175,10 @@ function updateLeaderboard(){
 function finishRace(){
 
     raceFinished=true;
-
     raceStarted=false;
 
-    raceStatus.textContent=
+    raceStatus.textContent =
         "FINISH";
-
-    /*
-    Pastikan ranking berdasarkan
-    urutan benar-benar melewati finish.
-    */
 
     const sortedFinish =
         [...finishOrder];
@@ -3455,12 +3193,10 @@ function finishRace(){
                     "div"
                 );
 
-            row.className=
+            row.className =
                 "final-row";
 
-            if(
-                index===0
-            ){
+            if(index===0){
 
                 row.classList.add(
                     "first"
@@ -3468,7 +3204,7 @@ function finishRace(){
 
             }
 
-            row.innerHTML=`
+            row.innerHTML = `
 
                 <span>
                     ${index+1}.
@@ -3476,11 +3212,7 @@ function finishRace(){
                 </span>
 
                 <span>
-                    ${
-                        index===0
-                        ? "🏆"
-                        : ""
-                    }
+                    ${index===0 ? "🏆" : ""}
                 </span>
 
             `;
@@ -3491,11 +3223,6 @@ function finishRace(){
 
         }
     );
-
-    /*
-    Kurangi jumlah forced games
-    setelah race benar-benar selesai.
-    */
 
     if(
         raceWinnerOverride!==null &&
@@ -3518,9 +3245,11 @@ function finishRace(){
 
     setTimeout(
         ()=>{
+
             finishPanel.classList.add(
                 "show"
             );
+
         },
         900
     );
@@ -3537,28 +3266,24 @@ function returnToMenu(){
         "show"
     );
 
-    setupPanel.style.display=
+    setupPanel.style.display =
         "flex";
 
     raceStarted=false;
-
     raceFinished=false;
 
-    raceStatus.textContent=
+    raceStatus.textContent =
         "Preparing race...";
 
 }
 
 /* =====================================================
    CAMERA
-   SIDE-TOP CINEMATIC
 ===================================================== */
 
 function updateCamera(){
 
-    if(
-        horses.length===0
-    ){
+    if(horses.length===0){
 
         return;
 
@@ -3575,12 +3300,14 @@ function updateCamera(){
     const leader =
         sorted[0];
 
-    const second =
-        sorted[1];
-
     /*
-    Fokus utama ke grup depan.
+    FIX:
+    Kalau hanya ada 1 horse,
+    second menggunakan leader.
     */
+
+    const second =
+        sorted[1] || leader;
 
     const centerX =
         (
@@ -3594,24 +3321,16 @@ function updateCamera(){
             second.model.position.z
         )/2;
 
-    /*
-    Kamera dari samping-atas.
-    BUKAN dari belakang.
-    */
-
-    const cameraDistance =
-        30;
+    const cameraDistance=30;
 
     const targetX =
         centerX+
         cameraDistance;
 
-    const targetY =
-        18;
+    const targetY=18;
 
     const targetZ =
-        centerZ+
-        10;
+        centerZ+10;
 
     camera.position.lerp(
 
@@ -3625,10 +3344,6 @@ function updateCamera(){
 
     );
 
-    /*
-    Lihat ke area kuda.
-    */
-
     const lookTarget =
         new THREE.Vector3(
             centerX,
@@ -3640,10 +3355,6 @@ function updateCamera(){
         lookTarget
     );
 
-    /*
-    Sedikit cinematic sway.
-    */
-
     if(raceStarted){
 
         camera.position.y +=
@@ -3652,10 +3363,6 @@ function updateCamera(){
             )*.12;
 
     }
-
-    /*
-    Dynamic FOV.
-    */
 
     const targetFov =
         raceStarted
@@ -3701,9 +3408,11 @@ function setupSecretControl(){
     button.addEventListener(
         "click",
         ()=>{
+
             panel.classList.toggle(
                 "show"
             );
+
         }
     );
 
@@ -3723,12 +3432,9 @@ function setupSecretControl(){
                     ).value
                 );
 
-            if(
-                winner===""
-            ){
+            if(winner===""){
 
                 raceWinnerOverride=null;
-
                 forcedGamesLeft=0;
 
             }
@@ -3756,7 +3462,6 @@ function setupSecretControl(){
         ()=>{
 
             raceWinnerOverride=null;
-
             forcedGamesLeft=0;
 
             updateSecretStatus();
@@ -3779,10 +3484,12 @@ function updateSecretHorseList(){
 
     if(!select)return;
 
-    select.innerHTML=
-        `<option value="">
+    select.innerHTML =
+        `
+        <option value="">
             🎲 RANDOM WINNER
-        </option>`;
+        </option>
+        `;
 
     horses.forEach(
         horse=>{
@@ -3792,10 +3499,10 @@ function updateSecretHorseList(){
                     "option"
                 );
 
-            option.value=
+            option.value =
                 horse.id;
 
-            option.textContent=
+            option.textContent =
                 `${horse.id+1}. ${horse.player}`;
 
             select.appendChild(
@@ -3825,7 +3532,7 @@ function updateSecretStatus(){
         forcedGamesLeft<=0
     ){
 
-        status.textContent=
+        status.textContent =
             "🎲 Random mode aktif";
 
         return;
@@ -3839,7 +3546,7 @@ function updateSecretStatus(){
                 raceWinnerOverride
         );
 
-    status.textContent=
+    status.textContent =
         `🏆 ${horse?.player||"Horse"} `
         +
         `ditargetkan menang ${forcedGamesLeft} game`;
@@ -3853,26 +3560,11 @@ function updateSecretStatus(){
 function escapeHTML(value){
 
     return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 
 }
 
@@ -3881,6 +3573,8 @@ function escapeHTML(value){
 ===================================================== */
 
 function onResize(){
+
+    if(!camera || !renderer)return;
 
     camera.aspect =
         window.innerWidth/
