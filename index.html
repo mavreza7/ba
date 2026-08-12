@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Horse Racing 3D — V15.2 FIX FULL</title>
+<title>Horse Racing 3D — V15.5 DENSE FOREST FULL</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#9bc7d9}
@@ -291,41 +291,111 @@ async function loadAssets(){
  setProgress(84,'Menata pohon dan batu...');
  // Environment dibuat lebih LEBAT agar arena tidak terasa kosong.
 // Semua objek tetap berada di luar lintasan agar tidak mengganggu kuda.
-const treePositions=[
-  [-27,210,4.8],[27,205,4.7],[-38,190,4.3],[38,184,4.5],
-  [-52,174,5.0],[52,165,4.8],[-29,145,4.6],[31,138,4.9],
-  [-43,120,4.5],[47,112,4.8],[-60,98,4.6],[60,90,4.7],
-  [-28,72,4.9],[29,64,4.6],[-42,48,4.7],[49,40,5.0],
-  [-58,24,4.5],[58,16,4.8],[-27,-5,4.6],[28,-12,4.9],
-  [-43,-28,4.8],[47,-36,4.6],[-61,-52,4.7],[61,-60,4.9],
-  [-29,-78,4.5],[31,-86,4.8],[-44,-104,5.0],[48,-112,4.7],
-  [-59,-128,4.6],[60,-138,4.8],[-28,-155,4.9],[30,-164,4.6],
-  [-43,-180,4.7],[48,-188,5.0],[-61,-204,4.8],[61,-214,4.6],
-  [-29,-232,4.7],[31,-240,4.9],[-45,-258,4.6],[49,-266,4.8],
-  [-59,-278,4.9],[60,-282,4.7]
+/*
+ * V15.5 — DENSE FOREST
+ * Hutan dibuat sangat lebat di kedua sisi arena.
+ * Jalur balapan tetap kosong agar 8 kuda tidak tertutup.
+ */
+const treePositions=[];
+const rockPositions=[];
+
+let envSeed=1547;
+function envRand(){
+  envSeed=(envSeed*1664525+1013904223)>>>0;
+  return envSeed/4294967296;
+}
+
+// Beberapa lapisan hutan di luar pagar.
+const treeRows=[
+  {x:24,jitter:4,step:15,min:3.8,max:5.0},
+  {x:31,jitter:5,step:13,min:4.0,max:5.4},
+  {x:41,jitter:7,step:12,min:4.2,max:5.8},
+  {x:53,jitter:8,step:14,min:4.5,max:6.2},
+  {x:67,jitter:10,step:12,min:4.2,max:6.0},
+  {x:82,jitter:12,step:15,min:4.0,max:5.7}
 ];
+
+for(const side of [-1,1]){
+  for(const row of treeRows){
+    let z=START+8-envRand()*8;
+    while(z>FINISH-8){
+      const x=side*(row.x+(envRand()-.5)*row.jitter*2);
+      const zz=z+(envRand()-.5)*row.step*.65;
+      const scale=row.min+envRand()*(row.max-row.min);
+      treePositions.push([x,zz,scale]);
+
+      // Pohon tambahan di sela-sela untuk membentuk hutan yang benar-benar padat.
+      if(envRand()<.34){
+        treePositions.push([
+          side*(row.x+7+(envRand()-.5)*8),
+          zz+(envRand()-.5)*7,
+          row.min-.45+envRand()*1.2
+        ]);
+      }
+      z-=row.step;
+    }
+  }
+}
+
+// Pohon luar/foreground tambahan agar horizon dan sisi arena tidak kosong.
+for(const side of [-1,1]){
+  for(let i=0;i<18;i++){
+    treePositions.push([
+      side*(48+envRand()*42),
+      START-10-envRand()*(LEN+20),
+      4.3+envRand()*2.0
+    ]);
+  }
+}
+
 treePositions.forEach((v,i)=>{
-  if(treeTemplates.length) addEnvironment(
-    treeTemplates[i%treeTemplates.length],v[0],v[1],v[2]
-  );
+  if(treeTemplates.length){
+    addEnvironment(treeTemplates[i%treeTemplates.length],v[0],v[1],v[2]);
+  }
 });
 
-const rockPositions=[
-  [-22,198,2.4],[22,188,2.3],[-32,170,2.6],[34,158,2.4],
-  [-46,145,2.5],[46,128,2.3],[-24,116,2.5],[25,100,2.4],
-  [-36,82,2.6],[38,70,2.3],[-50,58,2.4],[51,46,2.6],
-  [-23,30,2.3],[24,18,2.5],[-36,0,2.4],[39,-18,2.5],
-  [-51,-30,2.6],[52,-45,2.4],[-23,-60,2.5],[25,-72,2.3],
-  [-37,-92,2.6],[40,-104,2.4],[-51,-120,2.5],[52,-132,2.3],
-  [-24,-148,2.4],[26,-160,2.6],[-38,-174,2.3],[41,-186,2.5],
-  [-52,-202,2.4],[53,-218,2.6],[-24,-226,2.5],[27,-244,2.4],
-  [-39,-252,2.6],[43,-262,2.3],[-53,-274,2.5],[54,-280,2.4]
+// Batu dibuat sebagai cluster kecil di antara hutan.
+const rockRows=[
+  {x:22,jitter:4,step:18},
+  {x:34,jitter:6,step:15},
+  {x:48,jitter:8,step:17},
+  {x:63,jitter:10,step:14},
+  {x:79,jitter:12,step:18}
 ];
+
+for(const side of [-1,1]){
+  for(const row of rockRows){
+    let z=START+2-envRand()*10;
+    while(z>FINISH-5){
+      if(envRand()<.72){
+        rockPositions.push([
+          side*(row.x+(envRand()-.5)*row.jitter*2),
+          z+(envRand()-.5)*8,
+          1.4+envRand()*1.7
+        ]);
+      }
+      z-=row.step;
+    }
+  }
+}
+
+for(const side of [-1,1]){
+  for(let i=0;i<24;i++){
+    rockPositions.push([
+      side*(45+envRand()*45),
+      START-envRand()*(LEN+15),
+      1.2+envRand()*2.0
+    ]);
+  }
+}
+
 rockPositions.forEach((v,i)=>{
-  if(rockTemplates.length) addEnvironment(
-    rockTemplates[i%rockTemplates.length],v[0],v[1],v[2]
-  );
+  if(rockTemplates.length){
+    addEnvironment(rockTemplates[i%rockTemplates.length],v[0],v[1],v[2]);
+  }
 });
+
+
 
  buildHorses();
  makeRows();
