@@ -343,10 +343,10 @@ function buildHorses(){
   let o;
   if(horseTemplate){
    o=prepareObject(cloneScene(horseTemplate));
-   fitObject(o,5.8); // KUDA DIBUAT JAUH LEBIH BESAR
+   fitObject(o,3.15); // UKURAN KUDA V15.3 — PROPORSIONAL DENGAN ARENA
   }else{
    o=createFallbackHorse(horseConfigs[i].color);
-   fitObject(o,5.8);
+   fitObject(o,3.15);
   }
   recolor(o,horseConfigs[i].color);
   // Model Quaternius diarahkan ke depan arena (-Z).
