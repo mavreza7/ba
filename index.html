@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Horse Racing 3D — V15.9 FIXED LANES</title>
+<title>Horse Racing 3D — V16 REALISTIC GROUND & SKY</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#9bc7d9}
@@ -51,7 +51,7 @@ canvas{display:block}
 <div id="loading">
  <div class="box">
   <h1>🏇 HORSE RACING</h1>
-  <div class="sub">Menyiapkan arena V15.2 FIX...</div>
+  <div class="sub">Menyiapkan arena V16 REALISTIC...</div>
   <div class="bar"><i id="prog"></i></div>
   <div class="loadtxt" id="lt">Memuat sistem 3D...</div>
  </div>
@@ -151,8 +151,23 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':
 buildMenu();
 
 const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x9bc7d9);
-scene.fog=new THREE.Fog(0x9bc7d9,210,760);
+
+function makeSkyTexture(){
+ const c=document.createElement('canvas');
+ c.width=2;c.height=512;
+ const ctx=c.getContext('2d');
+ const g=ctx.createLinearGradient(0,0,0,512);
+ g.addColorStop(0,'#6fa8c2');
+ g.addColorStop(.42,'#a9d2df');
+ g.addColorStop(.72,'#d9e7e6');
+ g.addColorStop(1,'#eef1e7');
+ ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
+ const t=new THREE.CanvasTexture(c);
+ t.colorSpace=THREE.SRGBColorSpace;
+ return t;
+}
+scene.background=makeSkyTexture();
+scene.fog=new THREE.Fog(0xb8d2d1,260,820);
 
 const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1800);
 camera.position.set(0,15,285);
@@ -163,17 +178,54 @@ renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.08;
 document.body.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xeaf7ff,0x587052,2.4));
-const sun=new THREE.DirectionalLight(0xffffff,3.2);
-sun.position.set(-80,140,160);
+scene.add(new THREE.HemisphereLight(0xf4fbff,0x506b4d,2.15));
+const sun=new THREE.DirectionalLight(0xfff4dc,3.5);
+sun.position.set(-90,150,130);
 sun.castShadow=true;
-sun.shadow.mapSize.set(1024,1024);
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-180;
+sun.shadow.camera.right=180;
+sun.shadow.camera.top=180;
+sun.shadow.camera.bottom=-180;
 scene.add(sun);
 
-const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.88,metalness:0});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(1300,1300),mat(0x8fd486));
+function noiseTexture(base, variation, size=512, cells=9000){
+ const c=document.createElement('canvas');
+ c.width=size;c.height=size;
+ const ctx=c.getContext('2d');
+ ctx.fillStyle=base;ctx.fillRect(0,0,size,size);
+ for(let i=0;i<cells;i++){
+   const x=Math.random()*size,y=Math.random()*size;
+   const r=Math.random()*2.4+.35;
+   const v=Math.floor(Math.random()*variation);
+   ctx.fillStyle=`rgba(${v},${v},${v},${.025+Math.random()*.075})`;
+   ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+ }
+ return new THREE.CanvasTexture(c);
+}
+
+const grassTex=noiseTexture('#6f9d55',38,512,12000);
+grassTex.wrapS=grassTex.wrapT=THREE.RepeatWrapping;
+grassTex.repeat.set(70,70);
+grassTex.colorSpace=THREE.SRGBColorSpace;
+
+const dirtTex=noiseTexture('#b9835e',42,512,11000);
+dirtTex.wrapS=dirtTex.wrapT=THREE.RepeatWrapping;
+dirtTex.repeat.set(3,34);
+dirtTex.colorSpace=THREE.SRGBColorSpace;
+
+const grassMat=new THREE.MeshStandardMaterial({
+ map:grassTex,color:0xa0bf78,roughness:1,metalness:0
+});
+const trackMat=new THREE.MeshStandardMaterial({
+ map:dirtTex,color:0xd09a73,roughness:.96,metalness:0
+});
+
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1300,1300),grassMat);
 ground.rotation.x=-Math.PI/2;
 ground.position.y=-.18;
 ground.receiveShadow=true;
@@ -181,11 +233,45 @@ scene.add(ground);
 
 const START=220, FINISH=-290, LEN=START-FINISH, W=31;
 
-const track=new THREE.Mesh(new THREE.PlaneGeometry(W,LEN+45),mat(0xd9ad86));
+const track=new THREE.Mesh(new THREE.PlaneGeometry(W,LEN+45),trackMat);
 track.rotation.x=-Math.PI/2;
 track.position.set(0,0,(START+FINISH)/2);
 track.receiveShadow=true;
 scene.add(track);
+
+// Soft cloud sprites: tidak menutup lintasan, hanya mengisi langit.
+function makeCloudTexture(){
+ const c=document.createElement('canvas');
+ c.width=512;c.height=256;
+ const ctx=c.getContext('2d');
+ ctx.clearRect(0,0,c.width,c.height);
+ for(let i=0;i<18;i++){
+   const x=70+Math.random()*370,y=110+Math.random()*55;
+   const r=32+Math.random()*52;
+   const g=ctx.createRadialGradient(x,y,2,x,y,r);
+   g.addColorStop(0,'rgba(255,255,255,.72)');
+   g.addColorStop(.55,'rgba(255,255,255,.38)');
+   g.addColorStop(1,'rgba(255,255,255,0)');
+   ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+ }
+ const t=new THREE.CanvasTexture(c);
+ t.colorSpace=THREE.SRGBColorSpace;
+ return t;
+}
+const cloudTexture=makeCloudTexture();
+for(let i=0;i<18;i++){
+ const sprite=new THREE.Sprite(new THREE.SpriteMaterial({
+  map:cloudTexture,transparent:true,depthWrite:false,opacity:.55
+ }));
+ sprite.position.set(
+  (Math.random()-.5)*600,
+  95+Math.random()*80,
+  -260-Math.random()*620
+ );
+ const sc=65+Math.random()*100;
+ sprite.scale.set(sc,sc*.48,1);
+ scene.add(sprite);
+}
 
 for(let i=1;i<8;i++){
  const x=-W/2+i*(W/8);
