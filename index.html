@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Horse Racing 3D — V15.6 ULTRA DENSE FOREST FULL</title>
+<title>Horse Racing 3D — V15.7 REALISTIC SCALE FULL</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#9bc7d9}
@@ -259,10 +259,33 @@ function fitObject(o,targetHeight){
  o.position.z-=center.z;
  o.position.y-=box.min.y;
 }
-function addEnvironment(template,x,z,scale){
+function addEnvironment(template,x,z,targetHeight,type='tree'){
  const o=prepareObject(cloneScene(template));
- o.scale.setScalar(scale);
- o.position.set(x,0,z);
+
+ // Jangan samakan skala mentah GLB dengan kuda.
+ // Semua aset dinormalisasi berdasarkan tinggi bounding-box.
+ const box=new THREE.Box3().setFromObject(o);
+ const size=box.getSize(new THREE.Vector3());
+ const height=Math.max(size.y,.001);
+
+ let finalHeight=targetHeight;
+ if(type==='tree'){
+   // Pohon dewasa: kira-kira 1.5–2.2x tinggi visual kuda.
+   finalHeight=THREE.MathUtils.clamp(targetHeight,4.7,7.2);
+ }else if(type==='rock'){
+   finalHeight=THREE.MathUtils.clamp(targetHeight,.55,1.35);
+ }
+
+ o.scale.multiplyScalar(finalHeight/height);
+
+ const box2=new THREE.Box3().setFromObject(o);
+ const center=box2.getCenter(new THREE.Vector3());
+
+ // Tempelkan objek ke tanah.
+ o.position.x=x-center.x;
+ o.position.z=z-center.z;
+ o.position.y=-box2.min.y;
+
  o.rotation.y=Math.random()*Math.PI*2;
  scene.add(o);
 }
@@ -292,44 +315,43 @@ async function loadAssets(){
  // Environment dibuat lebih LEBAT agar arena tidak terasa kosong.
 // Semua objek tetap berada di luar lintasan agar tidak mengganggu kuda.
 /*
- * V15.5 — DENSE FOREST
- * Hutan dibuat sangat lebat di kedua sisi arena.
- * Jalur balapan tetap kosong agar 8 kuda tidak tertutup.
+ * V15.7 — REALISTIC SCALE + DENSE FOREST
+ * Pohon tidak lagi memakai skala mentah GLB.
+ * Tinggi pohon dinormalisasi supaya proporsional terhadap kuda.
  */
 const treePositions=[];
 const rockPositions=[];
 
-let envSeed=1547;
+let envSeed=1571;
 function envRand(){
   envSeed=(envSeed*1664525+1013904223)>>>0;
   return envSeed/4294967296;
 }
 
-// Beberapa lapisan hutan di luar pagar.
 const treeRows=[
-  {x:24,jitter:4,step:15,min:3.8,max:5.0},
-  {x:31,jitter:5,step:13,min:4.0,max:5.4},
-  {x:41,jitter:7,step:12,min:4.2,max:5.8},
-  {x:53,jitter:8,step:14,min:4.5,max:6.2},
-  {x:67,jitter:10,step:12,min:4.2,max:6.0},
-  {x:82,jitter:12,step:15,min:4.0,max:5.7}
+  {x:27,jitter:4,step:14,min:4.8,max:5.8},
+  {x:35,jitter:5,step:12,min:5.0,max:6.2},
+  {x:44,jitter:6,step:11,min:5.2,max:6.6},
+  {x:55,jitter:8,step:12,min:5.3,max:6.8},
+  {x:68,jitter:9,step:13,min:5.0,max:6.5},
+  {x:82,jitter:11,step:15,min:5.2,max:7.0}
 ];
 
+// Hutan rapat, tetapi pohon terdekat tidak masuk terlalu jauh ke kamera.
 for(const side of [-1,1]){
   for(const row of treeRows){
-    let z=START+8-envRand()*8;
-    while(z>FINISH-8){
+    let z=START+6-envRand()*7;
+    while(z>FINISH-7){
       const x=side*(row.x+(envRand()-.5)*row.jitter*2);
-      const zz=z+(envRand()-.5)*row.step*.65;
-      const scale=row.min+envRand()*(row.max-row.min);
-      treePositions.push([x,zz,scale]);
+      const zz=z+(envRand()-.5)*row.step*.6;
+      const h=row.min+envRand()*(row.max-row.min);
+      treePositions.push([x,zz,h]);
 
-      // Pohon tambahan di sela-sela untuk membentuk hutan yang benar-benar padat.
-      if(envRand()<.34){
+      if(envRand()<.38){
         treePositions.push([
-          side*(row.x+7+(envRand()-.5)*8),
-          zz+(envRand()-.5)*7,
-          row.min-.45+envRand()*1.2
+          side*(row.x+5+envRand()*6),
+          zz+(envRand()-.5)*6,
+          row.min-.2+envRand()*1.0
         ]);
       }
       z-=row.step;
@@ -337,129 +359,41 @@ for(const side of [-1,1]){
   }
 }
 
-// Pohon luar/foreground tambahan agar horizon dan sisi arena tidak kosong.
+// Background forest wall: rapat tetapi ukurannya sedikit lebih kecil.
 for(const side of [-1,1]){
-  for(let i=0;i<18;i++){
+  for(let i=0;i<46;i++){
     treePositions.push([
-      side*(48+envRand()*42),
-      START-10-envRand()*(LEN+20),
-      4.3+envRand()*2.0
-    ]);
-  }
-}
-
-/*
- * V15.6 — ULTRA DENSE FOREST WALL
- * Tambahan lapisan dekat pagar + lapisan tengah + dinding horizon.
- * Ini khusus untuk mengisi area yang masih terlihat kosong pada POV cinematic.
- */
-const denseRows=[
-  {x:18.8,step:8.0,min:2.7,max:3.8},
-  {x:21.5,step:7.0,min:2.9,max:4.0},
-  {x:25.0,step:8.5,min:3.0,max:4.3},
-  {x:29.0,step:9.0,min:3.1,max:4.5},
-  {x:35.0,step:10.0,min:3.2,max:4.7},
-  {x:43.0,step:11.0,min:3.4,max:5.0}
-];
-
-for(const side of [-1,1]){
-  for(const row of denseRows){
-    let z=START+4-envRand()*4;
-    while(z>FINISH-4){
-      treePositions.push([
-        side*(row.x+(envRand()-.5)*2.4),
-        z+(envRand()-.5)*4.5,
-        row.min+envRand()*(row.max-row.min)
-      ]);
-
-      // Cluster kedua di sebagian titik agar celah antarpohon hampir hilang.
-      if(envRand()<.58){
-        treePositions.push([
-          side*(row.x+2.2+(envRand()-.5)*3.5),
-          z+(envRand()-.5)*6,
-          row.min-.35+envRand()*1.0
-        ]);
-      }
-      z-=row.step;
-    }
-  }
-}
-
-// Dinding pohon jauh di horizon: banyak pohon kecil dengan jarak rapat.
-for(const side of [-1,1]){
-  for(let layer=0;layer<4;layer++){
-    const x=52+layer*14;
-    let z=START+12-layer*5;
-    while(z>FINISH-15){
-      if(envRand()<.88){
-        treePositions.push([
-          side*(x+(envRand()-.5)*10),
-          z+(envRand()-.5)*8,
-          2.5+envRand()*1.8
-        ]);
-      }
-      z-=7.5+envRand()*3;
-    }
-  }
-}
-
-// Beberapa kelompok besar sebagai foreground, tetapi tidak masuk lintasan.
-for(const side of [-1,1]){
-  for(let i=0;i<28;i++){
-    treePositions.push([
-      side*(55+envRand()*50),
-      START-envRand()*(LEN+30),
-      3.5+envRand()*2.4
+      side*(72+envRand()*48),
+      START-5-envRand()*(LEN+15),
+      4.6+envRand()*1.5
     ]);
   }
 }
 
 treePositions.forEach((v,i)=>{
   if(treeTemplates.length){
-    addEnvironment(treeTemplates[i%treeTemplates.length],v[0],v[1],v[2]);
+    addEnvironment(treeTemplates[i%treeTemplates.length],v[0],v[1],v[2],'tree');
   }
 });
 
-// Batu dibuat sebagai cluster kecil di antara hutan.
-const rockRows=[
-  {x:22,jitter:4,step:18},
-  {x:34,jitter:6,step:15},
-  {x:48,jitter:8,step:17},
-  {x:63,jitter:10,step:14},
-  {x:79,jitter:12,step:18}
-];
-
+// Batu kecil–sedang, proporsional terhadap kuda.
 for(const side of [-1,1]){
-  for(const row of rockRows){
-    let z=START+2-envRand()*10;
-    while(z>FINISH-5){
-      if(envRand()<.72){
-        rockPositions.push([
-          side*(row.x+(envRand()-.5)*row.jitter*2),
-          z+(envRand()-.5)*8,
-          1.4+envRand()*1.7
-        ]);
-      }
-      z-=row.step;
+  for(let i=0;i<115;i++){
+    const x=side*(30+envRand()*72);
+    const z=START-envRand()*(LEN+10);
+    if(envRand()<.78){
+      rockPositions.push([x,z,.55+envRand()*.75]);
     }
-  }
-}
-
-for(const side of [-1,1]){
-  for(let i=0;i<24;i++){
-    rockPositions.push([
-      side*(45+envRand()*45),
-      START-envRand()*(LEN+15),
-      1.2+envRand()*2.0
-    ]);
   }
 }
 
 rockPositions.forEach((v,i)=>{
   if(rockTemplates.length){
-    addEnvironment(rockTemplates[i%rockTemplates.length],v[0],v[1],v[2]);
+    addEnvironment(rockTemplates[i%rockTemplates.length],v[0],v[1],v[2],'rock');
   }
 });
+
+
 
 
 
