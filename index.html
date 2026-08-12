@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Horse Racing 3D — V15.5 DENSE FOREST FULL</title>
+<title>Horse Racing 3D — V15.6 ULTRA DENSE FOREST FULL</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#9bc7d9}
@@ -344,6 +344,72 @@ for(const side of [-1,1]){
       side*(48+envRand()*42),
       START-10-envRand()*(LEN+20),
       4.3+envRand()*2.0
+    ]);
+  }
+}
+
+/*
+ * V15.6 — ULTRA DENSE FOREST WALL
+ * Tambahan lapisan dekat pagar + lapisan tengah + dinding horizon.
+ * Ini khusus untuk mengisi area yang masih terlihat kosong pada POV cinematic.
+ */
+const denseRows=[
+  {x:18.8,step:8.0,min:2.7,max:3.8},
+  {x:21.5,step:7.0,min:2.9,max:4.0},
+  {x:25.0,step:8.5,min:3.0,max:4.3},
+  {x:29.0,step:9.0,min:3.1,max:4.5},
+  {x:35.0,step:10.0,min:3.2,max:4.7},
+  {x:43.0,step:11.0,min:3.4,max:5.0}
+];
+
+for(const side of [-1,1]){
+  for(const row of denseRows){
+    let z=START+4-envRand()*4;
+    while(z>FINISH-4){
+      treePositions.push([
+        side*(row.x+(envRand()-.5)*2.4),
+        z+(envRand()-.5)*4.5,
+        row.min+envRand()*(row.max-row.min)
+      ]);
+
+      // Cluster kedua di sebagian titik agar celah antarpohon hampir hilang.
+      if(envRand()<.58){
+        treePositions.push([
+          side*(row.x+2.2+(envRand()-.5)*3.5),
+          z+(envRand()-.5)*6,
+          row.min-.35+envRand()*1.0
+        ]);
+      }
+      z-=row.step;
+    }
+  }
+}
+
+// Dinding pohon jauh di horizon: banyak pohon kecil dengan jarak rapat.
+for(const side of [-1,1]){
+  for(let layer=0;layer<4;layer++){
+    const x=52+layer*14;
+    let z=START+12-layer*5;
+    while(z>FINISH-15){
+      if(envRand()<.88){
+        treePositions.push([
+          side*(x+(envRand()-.5)*10),
+          z+(envRand()-.5)*8,
+          2.5+envRand()*1.8
+        ]);
+      }
+      z-=7.5+envRand()*3;
+    }
+  }
+}
+
+// Beberapa kelompok besar sebagai foreground, tetapi tidak masuk lintasan.
+for(const side of [-1,1]){
+  for(let i=0;i<28;i++){
+    treePositions.push([
+      side*(55+envRand()*50),
+      START-envRand()*(LEN+30),
+      3.5+envRand()*2.4
     ]);
   }
 }
