@@ -3,75 +3,564 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Horse Racing 3D — V15.1 FIX</title>
+<title>Horse Racing 3D — V15.2 FIX FULL</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#9bc7d9}canvas{display:block}
-#loading,#menu{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center}#loading{background:linear-gradient(#9bc7d9,#789ead);color:#fff}.box{width:min(430px,90vw);padding:28px;border-radius:24px;background:rgba(28,39,39,.88);text-align:center;box-shadow:0 20px 60px #0005}.box h1{letter-spacing:3px;font-size:22px}.sub{font-size:13px;color:#cbd5d5;margin-top:8px}.bar{height:8px;background:#ffffff20;border-radius:20px;margin-top:20px;overflow:hidden}.bar i{display:block;width:0;height:100%;background:#fff;transition:.2s}.loadtxt{font-size:12px;margin-top:10px;color:#dbe3e3}
-#menu{background:#0007}.menu{width:min(520px,92vw);padding:28px;border-radius:25px;background:#202b2cE8;color:#fff;box-shadow:0 25px 80px #0006}.menu h1{text-align:center;letter-spacing:3px}.menu .sub{text-align:center;margin-bottom:22px}.label{font-size:12px;font-weight:bold;color:#cbd4d4;margin:10px 0 7px}.name{width:100%;height:48px;border:1px solid #ffffff22;border-radius:12px;background:#ffffff0d;color:#fff;padding:0 14px;font-size:15px;outline:none}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.horsebtn{border:1px solid #ffffff18;border-radius:12px;background:#ffffff0b;color:#fff;padding:10px 4px;cursor:pointer;font-size:11px;font-weight:bold}.horsebtn.active{background:#ffffff25;border-color:#fff}.dot{width:24px;height:24px;border-radius:50%;margin:0 auto 6px;border:2px solid #fff8}.start,.restart{width:100%;height:50px;border:0;border-radius:13px;background:#fff;color:#263436;font-weight:900;cursor:pointer;margin-top:20px}.start:hover,.restart:hover{transform:translateY(-1px)}
-#hud{position:fixed;inset:0;z-index:20;pointer-events:none}.title{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:320px;padding:14px 20px;border-radius:18px;background:#263535c7;color:#fff;text-align:center;backdrop-filter:blur(10px)}.title h2{font-size:20px;letter-spacing:3px}.title small{display:block;margin-top:6px;color:#cbd4d4}#board{position:absolute;top:20px;right:18px;width:250px;padding:14px;border-radius:18px;background:#263535c7;color:#fff;backdrop-filter:blur(10px)}.bt{font-weight:900;font-size:15px;margin:0 4px 9px}.row{display:grid;grid-template-columns:22px 1fr 55px;gap:4px;padding:7px 8px;margin:3px 0;border-radius:8px;background:#ffffff0d;font-size:11px;font-weight:bold}.row.me{background:#ffffff24}.dist{text-align:right;color:#cbd4d4}#status{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:30px;background:#262b2acc;color:#fff;font-size:12px;font-weight:900}#result{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(430px,90vw);padding:28px;border-radius:24px;background:#202929ed;color:#fff;text-align:center;box-shadow:0 25px 80px #0007}.resultp{color:#cbd4d4;font-size:13px;line-height:1.6;margin-top:8px}
-@media(max-width:700px){.title{top:10px;width:245px;padding:11px}.title h2{font-size:15px}#board{top:10px;right:8px;width:205px}.row{font-size:10px}.grid{grid-template-columns:repeat(2,1fr)}}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#9bc7d9}
+canvas{display:block}
+#loading,#menu{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center}
+#loading{background:linear-gradient(#9bc7d9,#789ead);color:#fff}
+.box{width:min(430px,90vw);padding:28px;border-radius:24px;background:rgba(28,39,39,.90);text-align:center;box-shadow:0 20px 60px #0006}
+.box h1{letter-spacing:3px;font-size:22px}.sub{font-size:13px;color:#cbd5d5;margin-top:8px}
+.bar{height:8px;background:#ffffff20;border-radius:20px;margin-top:20px;overflow:hidden}.bar i{display:block;width:0;height:100%;background:#fff;transition:.2s}
+.loadtxt{font-size:12px;margin-top:10px;color:#dbe3e3}
+#menu{background:rgba(0,0,0,.55);overflow:auto;padding:20px}
+.menu{width:min(720px,96vw);max-height:94vh;overflow:auto;padding:25px;border-radius:25px;background:rgba(25,35,36,.96);color:#fff;box-shadow:0 25px 80px #0008}
+.menu h1{text-align:center;letter-spacing:3px;font-size:24px}.menu .sub{text-align:center;margin-bottom:18px}
+.tip{background:#ffffff0d;border:1px solid #ffffff16;padding:10px 12px;border-radius:12px;font-size:12px;color:#d6dfdf;margin-bottom:15px;text-align:center}
+.horse-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.horse-card{border:1px solid #ffffff18;border-radius:15px;background:#ffffff09;padding:12px;display:grid;grid-template-columns:42px 1fr 48px;gap:10px;align-items:center;cursor:pointer;transition:.15s}
+.horse-card.active{background:#ffffff1c;border-color:#fff}
+.horse-card .pick{width:36px;height:36px;border-radius:50%;border:2px solid #ffffff88;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+.horse-card label{display:block;font-size:10px;color:#aebcbc;margin-bottom:4px}
+.horse-card input[type=text]{width:100%;height:34px;border:1px solid #ffffff18;border-radius:9px;background:#ffffff0d;color:#fff;padding:0 9px;outline:none;font-weight:bold}
+.horse-card input[type=color]{width:40px;height:34px;padding:2px;border:1px solid #ffffff22;border-radius:8px;background:#ffffff0d;cursor:pointer}
+.select-hint{font-size:10px;color:#aebcbc;margin-top:4px}
+.start{width:100%;height:52px;border:0;border-radius:13px;background:#fff;color:#263436;font-weight:900;cursor:pointer;margin-top:18px;font-size:14px}
+.start:hover,.restart:hover{transform:translateY(-1px)}
+#hud{position:fixed;inset:0;z-index:20;pointer-events:none}
+.title{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:320px;padding:14px 20px;border-radius:18px;background:#263535c7;color:#fff;text-align:center;backdrop-filter:blur(10px)}
+.title h2{font-size:20px;letter-spacing:3px}.title small{display:block;margin-top:6px;color:#cbd4d4}
+#board{position:absolute;top:20px;right:18px;width:265px;padding:14px;border-radius:18px;background:#263535d4;color:#fff;backdrop-filter:blur(10px)}
+.bt{font-weight:900;font-size:15px;margin:0 4px 9px}
+.row{display:grid;grid-template-columns:24px 1fr 58px;gap:4px;padding:7px 8px;margin:3px 0;border-radius:8px;background:#ffffff0d;font-size:11px;font-weight:bold}
+.row.me{background:#ffffff2b;outline:1px solid #ffffff25}.dist{text-align:right;color:#cbd4d4}
+#status{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:30px;background:#262b2acc;color:#fff;font-size:12px;font-weight:900}
+#result{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(450px,90vw);padding:30px;border-radius:24px;background:#202929ed;color:#fff;text-align:center;box-shadow:0 25px 80px #0008;pointer-events:auto}
+#result h2{font-size:25px;letter-spacing:1px}.resultp{color:#d1dada;font-size:14px;line-height:1.7;margin-top:10px}
+.restart{width:100%;height:48px;border:0;border-radius:12px;background:#fff;color:#263436;font-weight:900;cursor:pointer;margin-top:18px}
+@media(max-width:700px){
+ .menu{padding:18px}.horse-grid{grid-template-columns:1fr}.title{top:10px;width:245px;padding:11px}.title h2{font-size:15px}
+ #board{top:10px;right:8px;width:210px}.row{font-size:10px}.title small{font-size:10px}
+}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
 <body>
-<div id="loading"><div class="box"><h1>HORSE RACING</h1><div class="sub">Menyiapkan arena V15 FIX...</div><div class="bar"><i id="prog"></i></div><div class="loadtxt" id="lt">Memuat sistem 3D...</div></div></div>
-<div id="menu"><div class="menu"><h1>🏇 HORSE RACING</h1><div class="sub">Pilih kuda dan beri nama sebelum balapan</div><div class="label">NAMA KUDA</div><input id="name" class="name" maxlength="20" value="Jagoan Saya" placeholder="Nama kuda kamu"><div class="label">PILIH KUDA</div><div id="grid" class="grid"></div><button id="start" class="start">🏁 MULAI BALAPAN</button></div></div>
-<div id="hud"><div class="title"><h2>🏇 HORSE RACING</h2><small id="state">READY</small></div><div id="board"><div class="bt">🏆 LIVE POSITION</div><div id="rows"></div></div><div id="status">Pilih kuda untuk mulai</div><div id="result"><h2 id="rt">🏆 FINISH!</h2><div id="rp" class="resultp"></div><button id="restart" class="restart">BALAP LAGI</button></div></div>
+
+<div id="loading">
+ <div class="box">
+  <h1>🏇 HORSE RACING</h1>
+  <div class="sub">Menyiapkan arena V15.2 FIX...</div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="loadtxt" id="lt">Memuat sistem 3D...</div>
+ </div>
+</div>
+
+<div id="menu" style="display:none">
+ <div class="menu">
+  <h1>🏇 HORSE RACING</h1>
+  <div class="sub">Atur nama + warna 8 kuda, lalu pilih kuda kamu</div>
+  <div class="tip">Klik kartu kuda untuk menjadikannya <b>KUDA KAMU</b>. Semua nama dan warna akan muncul di Live Position dan hasil pemenang.</div>
+  <div id="horseGrid" class="horse-grid"></div>
+  <button id="start" class="start">🏁 MULAI BALAPAN</button>
+ </div>
+</div>
+
+<div id="hud">
+ <div class="title"><h2>🏇 HORSE RACING</h2><small id="state">READY</small></div>
+ <div id="board"><div class="bt">🏆 LIVE POSITION</div><div id="rows"></div></div>
+ <div id="status">Siap balapan</div>
+ <div id="result">
+  <h2 id="rt">🏆 FINISH!</h2>
+  <div id="rp" class="resultp"></div>
+  <button id="restart" class="restart">BALAP LAGI</button>
+ </div>
+</div>
+
 <script type="module">
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
-const HORSE='./quaternius_cc0-white-horse-1081(1).glb';
-const DIR='./assets/trees/';
-const TREES=['quaternius_cc0-common-tree-846.glb','quaternius_cc0-common-tree-838.glb','quaternius_cc0-common-tree-837.glb','quaternius_cc0-common-tree-839.glb','quaternius_cc0-common-tree-835.glb'];
-const ROCKS=['quaternius_cc0-mossy-rock-1304.glb','quaternius_cc0-mossy-rock-1303.glb','quaternius_cc0-mossy-rock-1309.glb','quaternius_cc0-mossy-rock-1308.glb'];
-const names=['Shadow','Golden Flash','Blaze','Lightning','Thunder','Black Storm','Wild Runner','Red Fury'];
-const colors=[0x111111,0xb88a19,0x8b351d,0x80888c,0x5b4735,0x08090a,0x70452b,0x9d3019];
-let selected=0,playerName='Jagoan Saya',horseAsset=null,trees=[],rocks=[],horses=[],running=false,done=false,clock=0,last=performance.now();
-const $=id=>document.getElementById(id),prog=$('prog'),lt=$('lt'),menu=$('menu'),grid=$('grid'),rows=$('rows'),status=$('status'),result=$('result');
+const HORSE_URL='./quaternius_cc0-white-horse-1081%281%29.glb';
+const ASSET_DIR='./assets/trees/';
 
-names.forEach((n,i)=>{let b=document.createElement('button');b.className='horsebtn'+(i?'':' active');b.innerHTML=`<div class="dot" style="background:#${colors[i].toString(16).padStart(6,'0')}"></div>${n}`;b.onclick=()=>{selected=i;document.querySelectorAll('.horsebtn').forEach(x=>x.classList.remove('active'));b.classList.add('active')};grid.appendChild(b)});
+const TREE_FILES=[
+ 'quaternius_cc0-common-tree-846.glb',
+ 'quaternius_cc0-common-tree-838.glb',
+ 'quaternius_cc0-common-tree-837.glb',
+ 'quaternius_cc0-common-tree-839.glb',
+ 'quaternius_cc0-common-tree-835.glb'
+];
+const ROCK_FILES=[
+ 'quaternius_cc0-mossy-rock-1304.glb',
+ 'quaternius_cc0-mossy-rock-1303.glb',
+ 'quaternius_cc0-mossy-rock-1309.glb',
+ 'quaternius_cc0-mossy-rock-1308.glb'
+];
 
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bc7d9);scene.fog=new THREE.Fog(0x9bc7d9,180,720);
-const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,1800);camera.position.set(0,20,55);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xe8f4ff,0x587052,2.2));const sun=new THREE.DirectionalLight(0xffffff,3);sun.position.set(-80,120,100);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
-const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.85});
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(1200,1200),mat(0x8fce86));ground.rotation.x=-Math.PI/2;ground.position.y=-.15;ground.receiveShadow=true;scene.add(ground);
-const LEN=520,W=30,START=230,FINISH=-290;
-const track=new THREE.Mesh(new THREE.PlaneGeometry(W,LEN+80),mat(0xd6aa83));track.rotation.x=-Math.PI/2;track.position.set(0,0,-30+LEN/2);track.receiveShadow=true;scene.add(track);
-for(let i=1;i<8;i++){let x=-W/2+i*(W/8),m=new THREE.Mesh(new THREE.PlaneGeometry(.07,LEN),new THREE.MeshBasicMaterial({color:0xe8c7aa,transparent:true,opacity:.75}));m.rotation.x=-Math.PI/2;m.position.set(x,.018,-30+LEN/2);scene.add(m)}
-function fence(side){let x=side*(W/2+1.7);for(let z=START+15;z>FINISH-20;z-=10){let p=new THREE.Mesh(new THREE.CylinderGeometry(.07,.09,1.5,8),mat(0xe7e8e3));p.position.set(x,.75,z);p.castShadow=true;scene.add(p);for(let y of [.45,1]){let r=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,10.2),mat(0xe7e8e3));r.position.set(x,y,z-5);scene.add(r)}}}fence(-1);fence(1);
-for(let i=0;i<16;i++){let q=new THREE.Mesh(new THREE.PlaneGeometry(W/16,2),new THREE.MeshBasicMaterial({color:i%2?0xffffff:0x222222}));q.rotation.x=-Math.PI/2;q.position.set(-W/2+(i+.5)*(W/16),.025,FINISH+4);scene.add(q)}
-let sl=new THREE.Mesh(new THREE.PlaneGeometry(W,1.4),new THREE.MeshBasicMaterial({color:0xffffff}));sl.rotation.x=-Math.PI/2;sl.position.set(0,.026,START-3);scene.add(sl);
-const loader=new GLTFLoader();const load=url=>new Promise((res,rej)=>loader.load(url,res,undefined,rej));
-function p(v,t){prog.style.width=v+'%';lt.textContent=t}
-function prep(o){o.traverse(x=>{if(x.isMesh){x.castShadow=true;x.receiveShadow=true;if(x.material)x.material=Array.isArray(x.material)?x.material.map(m=>m.clone()):x.material.clone()}});return o}
-function clone(a){return a?.scene.clone(true)}
-function env(a,x,z,s){let o=clone(a);if(!o)return;prep(o);o.scale.setScalar(s);o.position.set(x,0,z);o.rotation.y=Math.random()*Math.PI*2;scene.add(o)}
-async function assets(){
- p(8,'Memuat model kuda...');try{horseAsset=await load(HORSE)}catch(e){console.error('Kuda:',e)}
- p(35,'Memuat 5 pohon...');let ts=await Promise.allSettled(TREES.map(x=>load(DIR+x)));ts.forEach(x=>x.status==='fulfilled'?trees.push(x.value):console.warn('Pohon gagal',x.reason));
- p(62,'Memuat 4 batu...');let rs=await Promise.allSettled(ROCKS.map(x=>load(DIR+x)));rs.forEach(x=>x.status==='fulfilled'?rocks.push(x.value):console.warn('Batu gagal',x.reason));
- p(82,'Menata lingkungan...');
- const tp=[[-35,190,4], [35,145,4.4],[-39,70,3.8],[39,-20,4.1],[-37,-115,4.3],[38,-205,4],[ -44,-260,4.1],[45,205,3.8],[46,65,4.1],[-47,-65,3.9],[47,-165,4.2]];tp.forEach((v,i)=>trees.length&&env(trees[i%trees.length],v[0],v[1],v[2]));
- const rp=[[-27,165,2.6],[29,95,2.4],[-30,-75,2.7],[30,-225,2.5],[27,220,2.4],[-29,15,2.3],[31,-140,2.6],[-26,-255,2.3]];rp.forEach((v,i)=>rocks.length&&env(rocks[i%rocks.length],v[0],v[1],v[2]));
- buildHorses();p(100,'Arena siap!');setTimeout(()=>{$('loading').style.display='none';menu.style.display='flex'},250)
+const defaultNames=['Shadow','Golden Flash','Blaze','Lightning','Thunder','Black Storm','Wild Runner','Red Fury'];
+const defaultColors=['#151515','#c08b18','#8e321b','#7e8790','#5b4735','#08090a','#70452b','#a3351c'];
+
+let horseConfigs=defaultNames.map((name,i)=>({name,color:defaultColors[i]}));
+let selectedHorse=0;
+let horseTemplate=null;
+let treeTemplates=[],rockTemplates=[];
+let horses=[];
+let running=false,finished=false,raceTime=0,last=performance.now();
+let randomWinner=0;
+
+const $=id=>document.getElementById(id);
+const loading=$('loading'),prog=$('prog'),lt=$('lt'),menu=$('menu'),grid=$('horseGrid');
+const rows=$('rows'),status=$('status'),result=$('result');
+
+function setProgress(v,text){prog.style.width=v+'%';lt.textContent=text}
+
+function buildMenu(){
+ grid.innerHTML='';
+ horseConfigs.forEach((cfg,i)=>{
+  const card=document.createElement('div');
+  card.className='horse-card'+(i===selectedHorse?' active':'');
+  card.innerHTML=`
+   <div class="pick">${i+1}</div>
+   <div>
+    <label>NAMA KUDA ${i+1}</label>
+    <input type="text" maxlength="20" value="${escapeHtml(cfg.name)}" data-name="${i}">
+    <div class="select-hint">${i===selectedHorse?'⭐ KUDA KAMU':'Klik kartu untuk memilih'}</div>
+   </div>
+   <input type="color" value="${cfg.color}" data-color="${i}" title="Pilih warna kuda">
+  `;
+  card.addEventListener('click',e=>{
+   if(e.target.matches('input')) return;
+   selectedHorse=i;
+   document.querySelectorAll('.horse-card').forEach(x=>x.classList.remove('active'));
+   card.classList.add('active');
+   buildMenu();
+  });
+  const nameInput=card.querySelector('[data-name]');
+  nameInput.addEventListener('input',e=>horseConfigs[i].name=e.target.value);
+  nameInput.addEventListener('click',e=>e.stopPropagation());
+  const colorInput=card.querySelector('[data-color]');
+  colorInput.addEventListener('input',e=>horseConfigs[i].color=e.target.value);
+  colorInput.addEventListener('click',e=>e.stopPropagation());
+  grid.appendChild(card);
+ });
 }
-function recolor(o,c){o.traverse(x=>{if(x.isMesh&&x.material){let a=Array.isArray(x.material)?x.material:[x.material];a.forEach(m=>{m.color.setHex(c);m.roughness=.72;m.metalness=0})}})}
-function buildHorses(){if(!horseAsset)return;names.forEach((n,i)=>{let o=clone(horseAsset);prep(o);let box=new THREE.Box3().setFromObject(o),sz=box.getSize(new THREE.Vector3());o.scale.setScalar(2.8/Math.max(sz.y,.001));recolor(o,colors[i]);o.rotation.y=Math.PI;let lane=-W/2+(i+.5)*(W/8);o.position.set(lane,.02,START-i*1.2);scene.add(o);let h={i,o,lane,target:lane,d:0,s:0,seed:Math.random()*1000,finished:false,rank:0,mixer:null};if(horseAsset.animations?.length){h.mixer=new THREE.AnimationMixer(o);let c=horseAsset.animations.find(a=>/gallop|run|walk|horse/i.test(a.name))||horseAsset.animations[0];h.mixer.clipAction(c).play().timeScale=1.25}horses.push(h)});makeRows()}
-function makeRows(){rows.innerHTML='';names.forEach((n,i)=>{let r=document.createElement('div');r.className='row';r.id='r'+i;r.innerHTML=`<span>${i+1}</span><span>${n}</span><span class="dist">0m</span>`;rows.appendChild(r)})}
-function startRace(){playerName=($('name').value||'Jagoan Saya').trim().slice(0,20)||'Jagoan Saya';if(!horses.length){alert('Kuda tidak terbaca. Pastikan quaternius_cc0-white-horse-1081(1).glb ada di root GitHub.');return}horses.forEach((h,i)=>{h.d=0;h.finished=false;h.rank=0;h.s=0;h.o.position.set(h.lane,.02,START-i*1.2);h.target=h.lane});running=true;done=false;clock=0;menu.style.display='none';$('state').textContent='RACING';status.textContent='🏁 RACE STARTED'}
-$('start').onclick=startRace;$('restart').onclick=()=>{result.style.display='none';menu.style.display='flex'};
-function board(){let sorted=[...horses].sort((a,b)=>b.d-a.d);sorted.forEach((h,r)=>{let el=$('r'+h.i);el.children[0].textContent=r+1;el.children[1].textContent=h.i===selected?playerName:names[h.i];el.querySelector('.dist').textContent=Math.round(h.d)+'m';el.classList.toggle('me',h.i===selected)})}
-function race(dt){if(!running||done)return;clock+=dt;for(let h of horses){if(h.finished)continue;let luck=Math.sin(clock*.82+h.seed)*2.4,stam=Math.sin(clock*.18+h.seed*.31)*1.15,burst=Math.sin(clock*.47+h.seed*1.7)>.82?2.7:0;h.s=15.5+(h.seed%4.5)+luck+stam+burst;
- let front=horses.filter(x=>x!==h&&!x.finished).map(x=>({x,dz:x.o.position.z-h.o.position.z})).filter(x=>x.dz<0&&x.dz>-7).sort((a,b)=>a.dz-b.dz)[0];if(front&&Math.abs(front.x.o.position.x-h.o.position.x)<3.2){let side=Math.sin(clock*1.7+h.seed)>0?1:-1;h.target=THREE.MathUtils.clamp(front.x.o.position.x+side*3.2,-W/2+2,W/2-2)}else h.target=THREE.MathUtils.clamp(h.lane+Math.sin(clock*.55+h.seed)*.55,-W/2+2,W/2-2);
- h.o.position.x=THREE.MathUtils.lerp(h.o.position.x,h.target,Math.min(1,dt*2.5));h.o.position.z-=h.s*dt;h.d=Math.max(0,START-h.o.position.z);if(h.mixer)h.mixer.update(dt);h.o.rotation.y=THREE.MathUtils.lerp(h.o.rotation.y,Math.PI,Math.min(1,dt*5));if(h.o.position.z<=FINISH){h.finished=true;h.rank=horses.filter(x=>x.finished).length;h.d=START-FINISH}}
- board();if(horses.every(h=>h.finished))finish()}
-function finish(){done=true;running=false;$('state').textContent='FINISHED';let s=[...horses].sort((a,b)=>b.d-a.d),win=s[0],pr=s.indexOf(horses[selected])+1;if(pr===1){$('rt').textContent='🏆 KAMU MENANG!';$('rp').innerHTML=`<b>${playerName}</b> finis posisi <b>#1</b>.<br><br>Hoki sedang berpihak kepadamu 😎🏇`}else{$('rt').textContent='🏁 BALAPAN SELESAI';$('rp').innerHTML=`Pemenang: <b>${win.i===selected?playerName:names[win.i]}</b><br>Kuda kamu <b>${playerName}</b> finis posisi <b>#${pr}</b>.<br><br>Coba lagi — hoki bisa berubah! 🎲`}result.style.display='block';status.textContent='🏁 FINISH!'}
-function cam(dt){if(!running){camera.position.lerp(new THREE.Vector3(0,20,55),Math.min(1,dt*2));camera.lookAt(0,2,START-30);return}let h=horses[selected];if(!h)return;let t=new THREE.Vector3(h.o.position.x*.2,18,h.o.position.z+34);camera.position.lerp(t,Math.min(1,dt*2.2));camera.lookAt(h.o.position.x,2,h.o.position.z-35)}
-function loop(now){requestAnimationFrame(loop);let dt=Math.min(.05,(now-last)/1000);last=now;race(dt);cam(dt);renderer.render(scene,camera)}
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-assets();loop(performance.now());
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+buildMenu();
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9bc7d9);
+scene.fog=new THREE.Fog(0x9bc7d9,210,760);
+
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,1800);
+camera.position.set(0,15,285);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));
+renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xeaf7ff,0x587052,2.4));
+const sun=new THREE.DirectionalLight(0xffffff,3.2);
+sun.position.set(-80,140,160);
+sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);
+scene.add(sun);
+
+const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.88,metalness:0});
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1300,1300),mat(0x8fd486));
+ground.rotation.x=-Math.PI/2;
+ground.position.y=-.18;
+ground.receiveShadow=true;
+scene.add(ground);
+
+const START=235, FINISH=-310, LEN=START-FINISH, W=34;
+
+const track=new THREE.Mesh(new THREE.PlaneGeometry(W,LEN+45),mat(0xd9ad86));
+track.rotation.x=-Math.PI/2;
+track.position.set(0,0,(START+FINISH)/2);
+track.receiveShadow=true;
+scene.add(track);
+
+for(let i=1;i<8;i++){
+ const x=-W/2+i*(W/8);
+ const laneLine=new THREE.Mesh(
+  new THREE.PlaneGeometry(.055,LEN),
+  new THREE.MeshBasicMaterial({color:0xf0d3b9,transparent:true,opacity:.7})
+ );
+ laneLine.rotation.x=-Math.PI/2;
+ laneLine.position.set(x,.02,(START+FINISH)/2);
+ scene.add(laneLine);
+}
+
+function addFence(side){
+ const x=side*(W/2+1.8);
+ for(let z=START+10;z>FINISH-12;z-=10){
+  const post=new THREE.Mesh(new THREE.CylinderGeometry(.07,.09,1.55,8),mat(0xe9ebe7));
+  post.position.set(x,.77,z);post.castShadow=true;scene.add(post);
+  for(const y of [.45,1.05]){
+   const rail=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,10.1),mat(0xe9ebe7));
+   rail.position.set(x,y,z-5);scene.add(rail);
+  }
+ }
+}
+addFence(-1);addFence(1);
+
+for(let i=0;i<16;i++){
+ const check=new THREE.Mesh(new THREE.PlaneGeometry(W/16,2.2),new THREE.MeshBasicMaterial({color:i%2?0xffffff:0x252525}));
+ check.rotation.x=-Math.PI/2;
+ check.position.set(-W/2+(i+.5)*(W/16),.026,FINISH+4);
+ scene.add(check);
+}
+const startLine=new THREE.Mesh(new THREE.PlaneGeometry(W,1.5),new THREE.MeshBasicMaterial({color:0xffffff}));
+startLine.rotation.x=-Math.PI/2;startLine.position.set(0,.026,START-3);scene.add(startLine);
+
+const loader=new GLTFLoader();
+function loadGLB(url){
+ return new Promise((resolve,reject)=>loader.load(url,resolve,undefined,reject));
+}
+function cloneScene(asset){
+ return SkeletonUtils.clone(asset.scene);
+}
+function prepareObject(o){
+ o.traverse(x=>{
+  if(x.isMesh){
+   x.castShadow=true;x.receiveShadow=true;
+   if(x.material){
+    x.material=Array.isArray(x.material)?x.material.map(m=>m.clone()):x.material.clone();
+   }
+  }
+ });
+ return o;
+}
+function recolor(o,hex){
+ o.traverse(x=>{
+  if(!x.isMesh||!x.material)return;
+  const arr=Array.isArray(x.material)?x.material:[x.material];
+  arr.forEach(m=>{
+   if(m.color)m.color.set(hex);
+   m.roughness=.72;m.metalness=0;
+  });
+ });
+}
+function fitObject(o,targetHeight){
+ const box0=new THREE.Box3().setFromObject(o);
+ const size0=box0.getSize(new THREE.Vector3());
+ const s=targetHeight/Math.max(size0.y,.001);
+ o.scale.multiplyScalar(s);
+ const box=new THREE.Box3().setFromObject(o);
+ const center=box.getCenter(new THREE.Vector3());
+ o.position.x-=center.x;
+ o.position.z-=center.z;
+ o.position.y-=box.min.y;
+}
+function addEnvironment(template,x,z,scale){
+ const o=prepareObject(cloneScene(template));
+ o.scale.setScalar(scale);
+ o.position.set(x,0,z);
+ o.rotation.y=Math.random()*Math.PI*2;
+ scene.add(o);
+}
+
+async function loadAssets(){
+ setProgress(8,'Memuat model kuda...');
+ try{
+  horseTemplate=await loadGLB(HORSE_URL);
+  setProgress(30,'Model kuda berhasil dimuat');
+ }catch(err){
+  console.error('Gagal memuat kuda:',err);
+  setProgress(30,'Model kuda gagal — memakai kuda cadangan');
+  horseTemplate=null;
+ }
+
+ setProgress(38,'Memuat 5 model pohon...');
+ const trees=await Promise.allSettled(TREE_FILES.map(f=>loadGLB(ASSET_DIR+f)));
+ trees.forEach(r=>{if(r.status==='fulfilled')treeTemplates.push(r.value)});
+ setProgress(58,`Pohon siap: ${treeTemplates.length}/5`);
+
+ setProgress(62,'Memuat 4 model batu...');
+ const rocks=await Promise.allSettled(ROCK_FILES.map(f=>loadGLB(ASSET_DIR+f)));
+ rocks.forEach(r=>{if(r.status==='fulfilled')rockTemplates.push(r.value)});
+ setProgress(78,`Batu siap: ${rockTemplates.length}/4`);
+
+ setProgress(84,'Menata pohon dan batu...');
+ const treePositions=[
+  [-48,215,4.9],[48,205,4.6],[-52,165,4.5],[53,135,5.0],[-49,95,4.7],
+  [50,65,4.6],[-53,25,5.0],[51,-15,4.8],[-50,-55,4.7],[54,-95,5.0],
+  [-52,-135,4.8],[50,-175,4.6],[-49,-215,5.0],[53,-255,4.8],
+  [-48,-295,4.7],[50,-300,5.0],[-60,185,4.3],[60,105,4.5]
+ ];
+ treePositions.forEach((v,i)=>{if(treeTemplates.length)addEnvironment(treeTemplates[i%treeTemplates.length],v[0],v[1],v[2])});
+
+ const rockPositions=[
+  [-39,190,2.7],[39,150,2.5],[-41,110,2.9],[40,72,2.5],[-39,35,2.8],
+  [40,-5,2.6],[-41,-48,2.8],[39,-88,2.5],[-40,-125,2.8],[41,-165,2.6],
+  [-39,-205,2.8],[40,-245,2.6],[-42,-285,2.7],[43,-300,2.5]
+ ];
+ rockPositions.forEach((v,i)=>{if(rockTemplates.length)addEnvironment(rockTemplates[i%rockTemplates.length],v[0],v[1],v[2])});
+
+ buildHorses();
+ makeRows();
+ setProgress(100,'Arena siap!');
+
+ setTimeout(()=>{
+  loading.style.display='none';
+  menu.style.display='flex';
+ },300);
+}
+
+function createFallbackHorse(color){
+ const g=new THREE.Group();
+ const body=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),mat(color));
+ body.scale.set(1.45,.7,.55);body.position.y=1.35;g.add(body);
+ const neck=new THREE.Mesh(new THREE.CylinderGeometry(.32,.45,1.35,12),mat(color));
+ neck.position.set(.95,1.9,0);neck.rotation.z=-.42;g.add(neck);
+ const head=new THREE.Mesh(new THREE.BoxGeometry(.75,.5,.48),mat(color));
+ head.position.set(1.55,2.45,0);g.add(head);
+ const muzzle=new THREE.Mesh(new THREE.BoxGeometry(.4,.3,.4),mat(color));
+ muzzle.position.set(1.92,2.35,0);g.add(muzzle);
+ for(const z of [-.34,.34]){
+  for(const x of [-.72,.7]){
+   const leg=new THREE.Mesh(new THREE.CylinderGeometry(.11,.14,1.25,10),mat(color));
+   leg.position.set(x,.7,z);g.add(leg);
+  }
+ }
+ const mane=new THREE.Mesh(new THREE.ConeGeometry(.25,.8,8),mat(0x2b1b12));
+ mane.position.set(.65,2.25,0);mane.rotation.z=-.45;g.add(mane);
+ return g;
+}
+
+function buildHorses(){
+ horses.forEach(h=>scene.remove(h.object));
+ horses=[];
+ const laneWidth=W/8;
+ for(let i=0;i<8;i++){
+  let o;
+  if(horseTemplate){
+   o=prepareObject(cloneScene(horseTemplate));
+   fitObject(o,5.8); // KUDA DIBUAT JAUH LEBIH BESAR
+  }else{
+   o=createFallbackHorse(horseConfigs[i].color);
+   fitObject(o,5.8);
+  }
+  recolor(o,horseConfigs[i].color);
+  // Model Quaternius diarahkan ke depan arena (-Z).
+  o.rotation.y=Math.PI;
+  const lane=-W/2+laneWidth*(i+.5);
+  o.position.set(lane,0,START-i*1.0);
+  scene.add(o);
+
+  let mixer=null;
+  if(horseTemplate?.animations?.length){
+   mixer=new THREE.AnimationMixer(o);
+   const clip=horseTemplate.animations.find(a=>/gallop|run|walk|horse/i.test(a.name))||horseTemplate.animations[0];
+   mixer.clipAction(clip).play().timeScale=1.35;
+  }
+
+  horses.push({
+   i,object:o,lane,targetLane:lane,distance:0,speed:0,seed:Math.random()*10000,
+   finished:false,finishOrder:0,mixer
+  });
+ }
+}
+
+function makeRows(){
+ rows.innerHTML='';
+ for(let i=0;i<8;i++){
+  const r=document.createElement('div');
+  r.className='row';
+  r.id='r'+i;
+  r.innerHTML=`<span>${i+1}</span><span>${escapeHtml(horseConfigs[i].name)}</span><span class="dist">0m</span>`;
+  rows.appendChild(r);
+ }
+}
+
+function updateConfigFromMenu(){
+ document.querySelectorAll('[data-name]').forEach(inp=>{
+  const i=Number(inp.dataset.name);
+  horseConfigs[i].name=(inp.value.trim()||`Kuda ${i+1}`).slice(0,20);
+ });
+ document.querySelectorAll('[data-color]').forEach(inp=>{
+  horseConfigs[Number(inp.dataset.color)].color=inp.value;
+ });
+}
+
+function startRace(){
+ updateConfigFromMenu();
+
+ // Sistem WIN RANDOM: pemenang ditentukan acak setiap balapan.
+ randomWinner=Math.floor(Math.random()*8);
+
+ buildHorses();
+ makeRows();
+ horses.forEach((h,i)=>{
+  h.distance=0;h.finished=false;h.finishOrder=0;
+  h.speed=0;h.targetLane=h.lane;
+  h.object.position.set(h.lane,0,START-i*1.0);
+ });
+
+ raceTime=0;running=true;finished=false;
+ menu.style.display='none';
+ result.style.display='none';
+ $('state').textContent='RACING';
+ status.textContent='🏁 RACE STARTED — SALIP MENYALIP!';
+}
+
+function updateBoard(){
+ const sorted=[...horses].sort((a,b)=>b.distance-a.distance);
+ sorted.forEach((h,pos)=>{
+  const r=$('r'+h.i);
+  r.children[0].textContent=pos+1;
+  r.children[1].textContent=horseConfigs[h.i].name;
+  r.querySelector('.dist').textContent=Math.round(h.distance)+'m';
+  r.classList.toggle('me',h.i===selectedHorse);
+ });
+}
+
+function race(dt){
+ if(!running||finished)return;
+ raceTime+=dt;
+
+ for(const h of horses){
+  if(h.finished)continue;
+
+  const isWinner=h.i===randomWinner;
+  const oscillation=Math.sin(raceTime*.85+h.seed)*1.9;
+  const surge=Math.sin(raceTime*.38+h.seed*1.7)>.82?2.8:0;
+  const rivalry=Math.sin(raceTime*.21+h.seed*.13)*.8;
+
+  // Pemenang acak mendapat keunggulan kecil, tetapi tetap bisa tersalip.
+  const winnerBoost=isWinner?1.35:0;
+  h.speed=17.5+(h.seed%3.8)+oscillation+rivalry+surge+winnerBoost;
+
+  // Deteksi kuda di depan dan pindah lane untuk menyalip.
+  const ahead=horses
+   .filter(x=>x!==h&&!x.finished)
+   .map(x=>({horse:x,dz:x.object.position.z-h.object.position.z}))
+   .filter(v=>v.dz<0&&v.dz>-9)
+   .sort((a,b)=>b.dz-a.dz)[0];
+
+  if(ahead && Math.abs(ahead.horse.object.position.x-h.object.position.x)<4.0){
+   const dir=(Math.sin(raceTime*1.9+h.seed)>0)?1:-1;
+   h.targetLane=THREE.MathUtils.clamp(
+    ahead.horse.object.position.x+dir*4.4,
+    -W/2+2.4,W/2-2.4
+   );
+  }else{
+   h.targetLane=THREE.MathUtils.clamp(
+    h.lane+Math.sin(raceTime*.65+h.seed)*.65,
+    -W/2+2.2,W/2-2.2
+   );
+  }
+
+  h.object.position.x=THREE.MathUtils.lerp(
+   h.object.position.x,h.targetLane,Math.min(1,dt*2.8)
+  );
+
+  h.object.position.z-=h.speed*dt;
+  h.distance=Math.max(0,START-h.object.position.z);
+
+  if(h.mixer)h.mixer.update(dt);
+
+  // Pastikan kuda selalu menghadap arah finish.
+  h.object.rotation.y=THREE.MathUtils.lerp(h.object.rotation.y,Math.PI,Math.min(1,dt*7));
+
+  if(h.object.position.z<=FINISH){
+   h.object.position.z=FINISH;
+   h.distance=START-FINISH;
+   h.finished=true;
+   h.finishOrder=horses.filter(x=>x.finished).length;
+  }
+ }
+
+ updateBoard();
+
+ if(horses.every(h=>h.finished))finishRace();
+}
+
+function finishRace(){
+ finished=true;running=false;
+ const sorted=[...horses].sort((a,b)=>b.distance-a.distance);
+ const winner=sorted[0];
+ const playerRank=sorted.findIndex(h=>h.i===selectedHorse)+1;
+ const winnerName=horseConfigs[winner.i].name;
+
+ $('state').textContent='FINISHED';
+
+ if(winner.i===selectedHorse){
+  $('rt').textContent='🏆 KAMU MENANG!';
+  $('rp').innerHTML=`
+   Pemenangnya adalah <b>${escapeHtml(winnerName)}</b>!<br><br>
+   Kuda kamu finis di posisi <b>#1</b>.<br>
+   Sistem hoki memilih pemenang secara random 🎲🏇
+  `;
+ }else{
+  $('rt').textContent='🏁 BALAPAN SELESAI';
+  $('rp').innerHTML=`
+   🏆 Pemenang: <b>${escapeHtml(winnerName)}</b><br>
+   Kuda kamu <b>${escapeHtml(horseConfigs[selectedHorse].name)}</b>
+   finis di posisi <b>#${playerRank}</b>.<br><br>
+   Hoki bisa berubah di balapan berikutnya 🎲
+  `;
+ }
+ status.textContent='🏁 FINISH!';
+ result.style.display='block';
+}
+
+function resetToMenu(){
+ result.style.display='none';
+ buildMenu();
+ menu.style.display='flex';
+ $('state').textContent='READY';
+ status.textContent='Atur kuda lalu mulai balapan';
+}
+
+$('start').onclick=startRace;
+$('restart').onclick=resetToMenu;
+
+function updateCamera(dt){
+ if(!running){
+  const target=new THREE.Vector3(0,17,285);
+  camera.position.lerp(target,Math.min(1,dt*2));
+  camera.lookAt(0,3,185);
+  return;
+ }
+
+ const h=horses[selectedHorse];
+ if(!h)return;
+
+ // Kamera mengikuti kuda yang dipilih dari belakang, dengan jarak cukup agar kuda terlihat besar.
+ const target=new THREE.Vector3(
+  h.object.position.x*.25,
+  13.5,
+  h.object.position.z+31
+ );
+ camera.position.lerp(target,Math.min(1,dt*3));
+ camera.lookAt(h.object.position.x,2.6,h.object.position.z-27);
+}
+
+function loop(now){
+ requestAnimationFrame(loop);
+ const dt=Math.min(.05,(now-last)/1000);
+ last=now;
+ race(dt);
+ updateCamera(dt);
+ renderer.render(scene,camera);
+}
+
+addEventListener('resize',()=>{
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+});
+
+loadAssets();
+loop(performance.now());
 </script>
-</body></html>
+</body>
+</html>
