@@ -179,7 +179,7 @@ ground.position.y=-.18;
 ground.receiveShadow=true;
 scene.add(ground);
 
-const START=235, FINISH=-310, LEN=START-FINISH, W=34;
+const START=220, FINISH=-290, LEN=START-FINISH, W=31;
 
 const track=new THREE.Mesh(new THREE.PlaneGeometry(W,LEN+45),mat(0xd9ad86));
 track.rotation.x=-Math.PI/2;
@@ -289,20 +289,43 @@ async function loadAssets(){
  setProgress(78,`Batu siap: ${rockTemplates.length}/4`);
 
  setProgress(84,'Menata pohon dan batu...');
- const treePositions=[
-  [-48,215,4.9],[48,205,4.6],[-52,165,4.5],[53,135,5.0],[-49,95,4.7],
-  [50,65,4.6],[-53,25,5.0],[51,-15,4.8],[-50,-55,4.7],[54,-95,5.0],
-  [-52,-135,4.8],[50,-175,4.6],[-49,-215,5.0],[53,-255,4.8],
-  [-48,-295,4.7],[50,-300,5.0],[-60,185,4.3],[60,105,4.5]
- ];
- treePositions.forEach((v,i)=>{if(treeTemplates.length)addEnvironment(treeTemplates[i%treeTemplates.length],v[0],v[1],v[2])});
+ // Environment dibuat lebih LEBAT agar arena tidak terasa kosong.
+// Semua objek tetap berada di luar lintasan agar tidak mengganggu kuda.
+const treePositions=[
+  [-27,210,4.8],[27,205,4.7],[-38,190,4.3],[38,184,4.5],
+  [-52,174,5.0],[52,165,4.8],[-29,145,4.6],[31,138,4.9],
+  [-43,120,4.5],[47,112,4.8],[-60,98,4.6],[60,90,4.7],
+  [-28,72,4.9],[29,64,4.6],[-42,48,4.7],[49,40,5.0],
+  [-58,24,4.5],[58,16,4.8],[-27,-5,4.6],[28,-12,4.9],
+  [-43,-28,4.8],[47,-36,4.6],[-61,-52,4.7],[61,-60,4.9],
+  [-29,-78,4.5],[31,-86,4.8],[-44,-104,5.0],[48,-112,4.7],
+  [-59,-128,4.6],[60,-138,4.8],[-28,-155,4.9],[30,-164,4.6],
+  [-43,-180,4.7],[48,-188,5.0],[-61,-204,4.8],[61,-214,4.6],
+  [-29,-232,4.7],[31,-240,4.9],[-45,-258,4.6],[49,-266,4.8],
+  [-59,-278,4.9],[60,-282,4.7]
+];
+treePositions.forEach((v,i)=>{
+  if(treeTemplates.length) addEnvironment(
+    treeTemplates[i%treeTemplates.length],v[0],v[1],v[2]
+  );
+});
 
- const rockPositions=[
-  [-39,190,2.7],[39,150,2.5],[-41,110,2.9],[40,72,2.5],[-39,35,2.8],
-  [40,-5,2.6],[-41,-48,2.8],[39,-88,2.5],[-40,-125,2.8],[41,-165,2.6],
-  [-39,-205,2.8],[40,-245,2.6],[-42,-285,2.7],[43,-300,2.5]
- ];
- rockPositions.forEach((v,i)=>{if(rockTemplates.length)addEnvironment(rockTemplates[i%rockTemplates.length],v[0],v[1],v[2])});
+const rockPositions=[
+  [-22,198,2.4],[22,188,2.3],[-32,170,2.6],[34,158,2.4],
+  [-46,145,2.5],[46,128,2.3],[-24,116,2.5],[25,100,2.4],
+  [-36,82,2.6],[38,70,2.3],[-50,58,2.4],[51,46,2.6],
+  [-23,30,2.3],[24,18,2.5],[-36,0,2.4],[39,-18,2.5],
+  [-51,-30,2.6],[52,-45,2.4],[-23,-60,2.5],[25,-72,2.3],
+  [-37,-92,2.6],[40,-104,2.4],[-51,-120,2.5],[52,-132,2.3],
+  [-24,-148,2.4],[26,-160,2.6],[-38,-174,2.3],[41,-186,2.5],
+  [-52,-202,2.4],[53,-218,2.6],[-24,-226,2.5],[27,-244,2.4],
+  [-39,-252,2.6],[43,-262,2.3],[-53,-274,2.5],[54,-280,2.4]
+];
+rockPositions.forEach((v,i)=>{
+  if(rockTemplates.length) addEnvironment(
+    rockTemplates[i%rockTemplates.length],v[0],v[1],v[2]
+  );
+});
 
  buildHorses();
  makeRows();
@@ -525,23 +548,29 @@ $('restart').onclick=resetToMenu;
 
 function updateCamera(dt){
  if(!running){
-  const target=new THREE.Vector3(0,17,285);
+  const target=new THREE.Vector3(42,30,255);
   camera.position.lerp(target,Math.min(1,dt*2));
-  camera.lookAt(0,3,185);
+  camera.lookAt(0,2,175);
   return;
  }
 
  const h=horses[selectedHorse];
  if(!h)return;
 
- // Kamera mengikuti kuda yang dipilih dari belakang, dengan jarak cukup agar kuda terlihat besar.
+ // Kamera cinematic dari ATAS + SAMPING.
+// Tetap mengikuti kuda pilihan tanpa mengubah sistem balapan.
+ const side = h.object.position.x >= 0 ? 1 : -1;
  const target=new THREE.Vector3(
-  h.object.position.x*.25,
-  13.5,
-  h.object.position.z+31
+  h.object.position.x + side*38,
+  28,
+  h.object.position.z + 42
  );
- camera.position.lerp(target,Math.min(1,dt*3));
- camera.lookAt(h.object.position.x,2.6,h.object.position.z-27);
+ camera.position.lerp(target,Math.min(1,dt*2.2));
+ camera.lookAt(
+  h.object.position.x,
+  1.8,
+  h.object.position.z - 18
+ );
 }
 
 function loop(now){
