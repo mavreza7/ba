@@ -218,6 +218,10 @@ dirtTex.wrapS=dirtTex.wrapT=THREE.RepeatWrapping;
 dirtTex.repeat.set(3,34);
 dirtTex.colorSpace=THREE.SRGBColorSpace;
 
+function mat(color, roughness=.82, metalness=0){
+ return new THREE.MeshStandardMaterial({color, roughness, metalness});
+}
+
 const grassMat=new THREE.MeshStandardMaterial({
  map:grassTex,color:0xa0bf78,roughness:1,metalness:0
 });
